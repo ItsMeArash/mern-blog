@@ -30,7 +30,7 @@ const Navbar = () => {
                         Sign In
                     </Link>
                     <Link to="/signup" className="btn-light py-2 hidden md:block">
-                        Sign In
+                        Sign Up
                     </Link>
                 </div>
             </nav>
