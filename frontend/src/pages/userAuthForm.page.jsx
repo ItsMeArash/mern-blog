@@ -2,14 +2,25 @@ import InputBox from "../components/input.component.jsx";
 import googleIcon from "../imgs/google.png"
 import {Link} from "react-router-dom";
 import AnimationWrapper from "../common/page-animation.jsx";
+import {useRef} from "react";
+import {useTranslation} from "react-i18next";
 
 const UserAuthForm = ({type}) => {
+    const authFormRef = useRef();
+    const {t} = useTranslation()
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const form = new FormData();
+
+    }
+
     return (
         <AnimationWrapper keyValue={type}>
             <section className="h-cover flex items-center justify-center">
-                <form className="w-[80%] max-w-[400px]">
+                <form ref={authFormRef} className="w-[80%] max-w-[400px]" onSubmit={handleSubmit}>
                     <h1 className="text-4xl font-gelasio capitalize text-center mb-24">
                         {type === "sign-in" ? "Welcome back" : "Join us now"}
+                        {t("greeting")}
                     </h1>
 
                     {
