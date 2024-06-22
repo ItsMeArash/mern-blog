@@ -1,9 +1,24 @@
 {
   "auth": {
+    "greeting": "Welcome Back",
     "signin": "Sign In",
-    "signup": "Sign Up"
+    "signup": "Sign Up",
+    "googleSignin": "Continue With Google",
+    "or": "Or",
+    "account": "Already a member?",
+    "notAccount": "Don't have an account?",
+    "join": "Join us",
+    "enter": "Sign in here"
   },
   "input": {
     "search": "Search"
+  },
+  "account": {
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password"
+  },
+  "article": {
+    "write": "Write"
   }
 }

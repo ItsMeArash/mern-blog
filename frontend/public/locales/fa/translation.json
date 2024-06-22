@@ -1,9 +1,24 @@
 {
   "auth": {
+    "greeting": "خوش آمدید",
     "signin": "ورود",
-    "signup": "ثبت نام"
+    "signup": "ثبت نام",
+    "googleSignin": "ورود با گوگل",
+    "or": "یا",
+    "account": "عضو هستید؟",
+    "notAccount": "حساب ندارید؟",
+    "join": "عضو شوید",
+    "enter": "وارد شود"
   },
   "input": {
     "search": "جستجو"
+  },
+  "account": {
+    "fullName": "نام کامل",
+    "email": "ایمیل",
+    "password": "کلمه عبور"
+  },
+  "article": {
+    "write": "نوشتن"
   }
 }

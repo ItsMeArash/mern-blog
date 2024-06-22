@@ -31,20 +31,18 @@ const Navbar = () => {
                             onClick={() => setSearchBoxVisibility(prev => !prev)}>
                         <i className="fi fi-rr-search text-xl"></i>
                     </button>
-                    <button className="w-12 h-12 rounded-full flex items-center justify-center"
-                            onClick={() => setLanguageSelectorVisibility(prev => !prev)}>
-                        <i className="fi fi-rr-globe text-2xl"></i>
-                    </button>
-                    {
-                        languageSelectorVisibility && (
-                            <AnimationWrapper>
-                                <LanguageSelector/>
-                            </AnimationWrapper>
-                        )
-                    }
+                    <div className='bg-grey flex rounded-full items-center'>
+                        <button className="w-12 h-12 rounded-full flex items-center justify-center"
+                                onClick={() => setLanguageSelectorVisibility(prev => !prev)}>
+                            <i className="fi fi-rr-globe text-2xl"></i>
+                        </button>
+                        {
+                            languageSelectorVisibility && <LanguageSelector setLanguageSelectorVisibility={setLanguageSelectorVisibility}/>
+                        }
+                    </div>
                     <Link to="/editor" className="hidden md:flex gap-2 link">
                         <i className="fi fi-rr-file-edit"></i>
-                        <p>Write</p>
+                        <p>{t("article.write")}</p>
                     </Link>
                     <Link to="/signin" className="btn-dark py-2">
                         {t("auth.signin")}

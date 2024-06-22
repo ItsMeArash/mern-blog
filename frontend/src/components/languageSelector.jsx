@@ -3,10 +3,10 @@ import {useEffect} from "react";
 
 const languages = [
     {code: "en", lang: "English"},
-    {code: "fa", lang: "Persian"}
+    {code: "fa", lang: "فارسی"}
 ]
 
-const LanguageSelector = () => {
+const LanguageSelector = ({setLanguageSelectorVisibility}) => {
     const {i18n} = useTranslation();
 
     useEffect(() => {
@@ -17,10 +17,10 @@ const LanguageSelector = () => {
         i18n.changeLanguage(language);
     };
     return (
-        <div className="">
+        <div className="flex gap-2">
             {
                 languages.map(lan => (
-                    <button className={`${lan.code === i18n.language ? "bg-grey" : ""}`}
+                    <button className={`${lan.code === i18n.language ? "btn-dark" : ""} px-4 py-2`}
                             key={lan.code}
                             onClick={() => changeLanguage(lan.code)}>
                         {lan.lang}
