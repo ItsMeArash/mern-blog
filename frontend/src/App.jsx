@@ -8,7 +8,14 @@ const App = () => {
     useEffect(() => {
         const userSelectedLanguage = localStorage.getItem("i18nextLng");
         if (userSelectedLanguage) {
-            document.body.dir = userSelectedLanguage === "fa" ? "rtl" : "ltr";
+            if (userSelectedLanguage === "fa") {
+                document.body.dir = "rtl";
+                document.body.className = "fa";
+            } else {
+                document.body.dir = "ltr";
+                document.body.className = "en";
+            }
+
         }
     }, []);
 

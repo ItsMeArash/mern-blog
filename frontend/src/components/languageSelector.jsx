@@ -15,6 +15,7 @@ const LanguageSelector = ({setLanguageSelectorVisibility}) => {
 
     const changeLanguage = (language) => {
         i18n.changeLanguage(language);
+        document.body.className = language;
     };
     return (
         <div className="flex gap-2">

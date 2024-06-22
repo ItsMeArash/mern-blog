@@ -134,6 +134,10 @@
     font-display: auto;
 }
 
-body {
+body.fa {
     font-family: 'Yekan';
+}
+
+body.en {
+    font-family: 'gelasio';
 }
