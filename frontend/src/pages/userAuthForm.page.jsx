@@ -20,7 +20,6 @@ const UserAuthForm = ({type}) => {
                 <form ref={authFormRef} className="w-[80%] max-w-[400px]" onSubmit={handleSubmit}>
                     <h1 className="text-4xl font-gelasio capitalize text-center mb-24">
                         {type === "sign-in" ? "Welcome back" : "Join us now"}
-                        {t("greeting")}
                     </h1>
 
                     {

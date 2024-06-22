@@ -20,7 +20,7 @@ const LanguageSelector = () => {
         <div className="">
             {
                 languages.map(lan => (
-                    <button className={`${lan.code === i18n.language ? "bg-red" : ""}`}
+                    <button className={`${lan.code === i18n.language ? "bg-grey" : ""}`}
                             key={lan.code}
                             onClick={() => changeLanguage(lan.code)}>
                         {lan.lang}

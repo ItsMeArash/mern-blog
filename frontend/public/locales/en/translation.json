@@ -1,3 +1,9 @@
 {
-  "greeting": "Hello, welcome!"
+  "auth": {
+    "signin": "Sign In",
+    "signup": "Sign Up"
+  },
+  "input": {
+    "search": "Search"
+  }
 }
