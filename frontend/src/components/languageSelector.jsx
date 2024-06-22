@@ -20,15 +20,17 @@ const LanguageSelector = () => {
     };
 
     return (
-        <div className='bg-grey flex rounded-full items-center'>
-            <button className="w-12 h-12 rounded-full flex items-center justify-center"
-                    onClick={() => setVisibility(prev => !prev)}>
-                <i className="fi fi-rr-globe text-2xl"></i>
-            </button>
-            <div className={`${visibility ? "flex" : "hidden"} gap-2`}>
+        <>
+            <div className='bg-grey flex rounded-full items-center'>
+                <button className="w-12 h-12 rounded-full flex items-center justify-center"
+                        onClick={() => setVisibility(prev => !prev)}>
+                    <i className="fi fi-rr-globe text-2xl"></i>
+                </button>
+            </div>
+            <div className={`${visibility ? "absolute" : "hidden"} flex-col gap-2 top-16 bg-grey rounded-2xl`}>
                 {
                     languages.map(lan => (
-                        <button className={`${lan.code === i18n.language ? "btn-dark" : ""} px-4 py-2`}
+                        <button className={`${lan.code === i18n.language ? "btn-dark" : ""} ${lan.code === "fa" ? "fa" : ""} px-4 border-b-2 rounded-full my-4 text-center mx-2 block py-2`}
                                 key={lan.code}
                                 onClick={() => changeLanguage(lan.code)}>
                             {lan.lang}
@@ -36,7 +38,7 @@ const LanguageSelector = () => {
                     ))
                 }
             </div>
-        </div>
+        </>
     )
 };
 
