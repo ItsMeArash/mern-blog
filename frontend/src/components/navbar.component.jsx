@@ -7,7 +7,6 @@ import {useTranslation} from "react-i18next";
 
 const Navbar = () => {
     const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
-    const [languageSelectorVisibility, setLanguageSelectorVisibility] = useState(false);
 
     const {t, i18n} = useTranslation();
 
@@ -31,15 +30,9 @@ const Navbar = () => {
                             onClick={() => setSearchBoxVisibility(prev => !prev)}>
                         <i className="fi fi-rr-search text-xl"></i>
                     </button>
-                    <div className='bg-grey flex rounded-full items-center'>
-                        <button className="w-12 h-12 rounded-full flex items-center justify-center"
-                                onClick={() => setLanguageSelectorVisibility(prev => !prev)}>
-                            <i className="fi fi-rr-globe text-2xl"></i>
-                        </button>
-                        {
-                            languageSelectorVisibility && <LanguageSelector setLanguageSelectorVisibility={setLanguageSelectorVisibility}/>
-                        }
-                    </div>
+
+                    <LanguageSelector/>
+
                     <Link to="/editor" className="hidden md:flex gap-2 link">
                         <i className="fi fi-rr-file-edit"></i>
                         <p>{t("article.write")}</p>

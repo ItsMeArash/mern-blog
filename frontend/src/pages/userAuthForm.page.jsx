@@ -11,6 +11,14 @@ const UserAuthForm = ({type}) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         const form = new FormData();
+        const formData = {};
+
+        for (let [key, value] of form.entries()) {
+            formData[key] = value;
+
+            // form validation
+
+        }
 
     }
 
