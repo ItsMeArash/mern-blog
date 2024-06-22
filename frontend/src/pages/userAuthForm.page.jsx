@@ -18,7 +18,7 @@ const UserAuthForm = ({type}) => {
         <AnimationWrapper keyValue={type}>
             <section className="h-cover flex items-center justify-center">
                 <form ref={authFormRef} className="w-[80%] max-w-[400px]" onSubmit={handleSubmit}>
-                    <h1 className="text-4xl font-gelasio capitalize text-center mb-24">
+                    <h1 className="text-4xl capitalize text-center mb-24">
                         {t("auth.greeting")}
                     </h1>
 
