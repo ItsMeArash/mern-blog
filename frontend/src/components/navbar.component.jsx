@@ -1,14 +1,27 @@
 import logo from "../imgs/logo.png";
 import {Link, Outlet} from "react-router-dom";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import LanguageSelector from "./languageSelector.jsx";
 import AnimationWrapper from "../common/page-animation.jsx";
 import {useTranslation} from "react-i18next";
+import {UserContext} from "../App.jsx";
+import UserNavigationPanel from "./user-navigation.component.jsx";
 
 const Navbar = () => {
     const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
+    const [userNavPanel, setUserNavPanel] = useState(false);
+
+    const {userAuth, userAuth: {accessToken, profile_img}} = useContext(UserContext);
 
     const {t, i18n} = useTranslation();
+
+    const handleUserNavPanel = () => {
+        setUserNavPanel(prev => !prev);
+    }
+
+    const handleBlur = () => {
+        setUserNavPanel(false);
+    }
 
     return (
         <>
@@ -37,12 +50,34 @@ const Navbar = () => {
                         <i className="fi fi-rr-file-edit"></i>
                         <p>{t("article.write")}</p>
                     </Link>
-                    <Link to="/signin" className="btn-dark py-2">
-                        {t("auth.signin")}
-                    </Link>
-                    <Link to="/signup" className="btn-light py-2 hidden md:block">
-                        {t("auth.signup")}
-                    </Link>
+
+                    {
+                        accessToken ? (
+                            <>
+                                <Link to="/dashboard/notification">
+                                    <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
+                                        <i className="fi fi-rr-bell text-2xl block mt-1 "></i>
+                                    </button>
+                                </Link>
+                                <div className="relative" onClick={handleUserNavPanel} onBlur={handleBlur}>
+                                    <button className="w-12 h-12 mt-1">
+                                        <img src={profile_img} alt="avatar" className="w-full h-full object-cover rounded-full"/>
+                                    </button>
+                                    {userNavPanel && <UserNavigationPanel/>}
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/signin" className="btn-dark py-2">
+                                    {t("auth.signin")}
+                                </Link>
+                                <Link to="/signup" className="btn-light py-2 hidden md:block">
+                                    {t("auth.signup")}
+                                </Link>
+                            </>
+                        )
+                    }
+
                 </div>
             </nav>
             <Outlet/>

@@ -27,7 +27,8 @@ const LanguageSelector = () => {
                     <i className="fi fi-rr-globe text-2xl"></i>
                 </button>
             </div>
-            <div className={`${visibility ? "absolute" : "hidden"} flex-col gap-2 top-16 bg-grey rounded-2xl hover:border-none shadow-xl`}>
+            <div className={`${visibility ? "absolute" : "hidden"} flex-col gap-2 top-16 bg-grey rounded-2xl hover:border-none shadow-xl`}
+            onBlur={() => setVisibility(false)}>
                 {
                     languages.map(lan => (
                         <button
