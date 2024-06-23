@@ -2,30 +2,64 @@ import InputBox from "../components/input.component.jsx";
 import googleIcon from "../imgs/google.png"
 import {Link} from "react-router-dom";
 import AnimationWrapper from "../common/page-animation.jsx";
-import {useRef} from "react";
 import {useTranslation} from "react-i18next";
+import {toast, Toaster} from "react-hot-toast";
+import axios from "axios";
+import {storeInSession} from "../common/session.jsx";
 
 const UserAuthForm = ({type}) => {
-    const authFormRef = useRef();
-    const {t} = useTranslation()
+    const {t} = useTranslation();
+
+    const userAuthThroughServer = (serverRoute, formData) => {
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + serverRoute, formData)
+            .then(({data}) => {
+                storeInSession("user", JSON.stringify(data));
+            })
+            .catch(({response}) => {
+                toast.error(response?.data?.error)
+            })
+    }
+
     const handleSubmit = (event) => {
         event.preventDefault();
-        const form = new FormData();
-        const formData = {};
 
+        const form = new FormData(event.target);
+        const formData = {};
         for (let [key, value] of form.entries()) {
             formData[key] = value;
-
-            // form validation
-
         }
 
+        const {fullname, email, password} = formData;
+        const serverRoute = type === "sign-in" ? "/signin" : "/signup";
+        const emailRegex = /^\w+([\.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+        const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+
+
+        // form validation
+        if (fullname?.length < 3) {
+            return toast.error("Full name must have at least 3 characters.");
+        }
+
+        if (!email?.length) {
+            return toast.error("Enter your email address!")
+        }
+
+        if (!emailRegex.test(email)) {
+            return toast.error("Invalid email format!")
+        }
+
+        if (!passwordRegex.test(password)) {
+            return toast.error("Password must be 6 up to 20 characters containing a numeric, a lowercase and a uppercase letter!")
+        }
+
+        userAuthThroughServer(serverRoute, formData);
     }
 
     return (
         <AnimationWrapper keyValue={type}>
             <section className="h-cover flex items-center justify-center">
-                <form ref={authFormRef} className="w-[80%] max-w-[400px]" onSubmit={handleSubmit}>
+                <Toaster/>
+                <form className="w-[80%] max-w-[400px]" onSubmit={handleSubmit}>
                     <h1 className="text-4xl capitalize text-center mb-24">
                         {t("auth.greeting")}
                     </h1>
