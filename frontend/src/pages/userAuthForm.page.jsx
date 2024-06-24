@@ -8,6 +8,7 @@ import axios from "axios";
 import {storeInSession} from "../common/session.jsx";
 import {useContext} from "react";
 import {UserContext} from "../App.jsx";
+import {authWithGoogle} from "../common/firebase.jsx";
 
 const UserAuthForm = ({type}) => {
     const {t} = useTranslation();
@@ -60,6 +61,24 @@ const UserAuthForm = ({type}) => {
         userAuthThroughServer(serverRoute, formData);
     }
 
+    const handleGoogleAuth = (event) => {
+        event.preventDefault();
+
+        authWithGoogle()
+            .then(user => {
+                const serverRoute = "/google-auth";
+                const formData = {
+                    access_token: user.accessToken
+                }
+
+                userAuthThroughServer(serverRoute, formData)
+            })
+            .catch(err => {
+                toast.error("Trouble with login using Google");
+                console.log(err)
+            });
+    }
+
     return (
         access_token ? <Navigate to="/"/> :
             <AnimationWrapper keyValue={type}>
@@ -98,7 +117,8 @@ const UserAuthForm = ({type}) => {
                             <hr className="w-1/2 border-black"/>
                         </div>
 
-                        <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center">
+                        <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
+                                onClick={handleGoogleAuth}>
                             <img src={googleIcon} alt="Google Icon" className="w-5"/>
                             {t("auth.googleSignin")}
                         </button>
