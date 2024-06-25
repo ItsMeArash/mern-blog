@@ -2,7 +2,6 @@ import logo from "../imgs/logo.png";
 import {Link, Outlet} from "react-router-dom";
 import {useContext, useState} from "react";
 import LanguageSelector from "./languageSelector.jsx";
-import AnimationWrapper from "../common/page-animation.jsx";
 import {useTranslation} from "react-i18next";
 import {UserContext} from "../App.jsx";
 import UserNavigationPanel from "./user-navigation.component.jsx";
@@ -20,7 +19,9 @@ const Navbar = () => {
     }
 
     const handleBlur = () => {
-        setUserNavPanel(false);
+        setTimeout(() => {
+            setUserNavPanel(false);
+        }, 100)
     }
 
     return (

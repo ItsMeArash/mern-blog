@@ -11,7 +11,6 @@ const UserNavigationPanel = () => {
 
     const signOutUser = () => {
         removeFromSession("user");
-        // TODO ACCESSTOKEN
         setUserAuth({accessToken: null})
     }
 
