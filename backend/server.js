@@ -6,7 +6,7 @@ import {nanoid} from "nanoid";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import admin from "firebase-admin";
-import serviceAccountKey from "./mern-blog-6eb87-firebase-adminsdk-6wi4s-40de442b11.json" assert {type: "json"}
+import serviceAccountKey from "./mern-blog-6eb87-firebase-adminsdk-6wi4s-b3a3fe5309.json" assert {type: "json"}
 import {getAuth} from "firebase-admin/auth";
 
 // Schemas
@@ -121,10 +121,10 @@ server.post("/signin", (req, res) => {
 })
 
 server.post("/google-auth", async (req, res) => {
-    const {accessToken} = req.body;
+    const {idToken} = req.body;
 
     getAuth()
-        .verifyIdToken(accessToken)
+        .verifyIdToken(idToken)
         .then(async (decodedUser) => {
             let {email, name} = decodedUser;
             console.log({decodedUser})
@@ -157,7 +157,10 @@ server.post("/google-auth", async (req, res) => {
 
             return res.status(200).json(formatDataToSend(user))
         })
-        .catch(err => res.status(500).json({"error": "Failed to authenticate you with Google!"}))
+        .catch(err => {
+            console.log(err)
+            return res.status(500).json({"error": "Failed to authenticate you with Google!"})
+        })
 })
 
 server.listen(PORT, () => {
