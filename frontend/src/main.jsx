@@ -6,11 +6,9 @@ import {BrowserRouter} from "react-router-dom";
 import "./i18n.js"
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
         <React.Suspense fallback="loading...">
             <BrowserRouter>
                 <App/>
             </BrowserRouter>
-        </React.Suspense>
-    </React.StrictMode>,
+        </React.Suspense>,
 )
