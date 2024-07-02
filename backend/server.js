@@ -18,7 +18,7 @@ let PORT = 3000;
 
 admin.initializeApp({
     // credential: admin.credential.cert(serviceAccountKey)
-    credential: admin.credential.cert({})
+    // credential: admin.credential.cert({})
 })
 
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
