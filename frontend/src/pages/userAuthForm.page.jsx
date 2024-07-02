@@ -13,8 +13,7 @@ import {authWithGoogle} from "../common/firebase.jsx";
 const UserAuthForm = ({type}) => {
     const {t} = useTranslation();
 
-    const {userAuth: {access_token}, setUserAuth} = useContext(UserContext);
-    console.log(access_token)
+    const {userAuth: {accessToken}, setUserAuth} = useContext(UserContext);
     const userAuthThroughServer = (serverRoute, formData) => {
         axios.post(import.meta.env.VITE_SERVER_DOMAIN + serverRoute, formData)
             .then(({data}) => {
@@ -63,15 +62,18 @@ const UserAuthForm = ({type}) => {
 
     const handleGoogleAuth = (event) => {
         event.preventDefault();
-
+        let idToken = null;
         authWithGoogle()
             .then(user => {
-                const serverRoute = "/google-auth";
-                const formData = {
-                    access_token: user.accessToken
-                }
+                user.getIdToken(true).then(token => {
+                    idToken = token
+                    const serverRoute = "/google-auth";
+                    const formData = {
+                        idToken
+                    }
 
-                userAuthThroughServer(serverRoute, formData)
+                    userAuthThroughServer(serverRoute, formData)
+                })
             })
             .catch(err => {
                 toast.error("Trouble with login using Google");
@@ -80,7 +82,7 @@ const UserAuthForm = ({type}) => {
     }
 
     return (
-        access_token ? <Navigate to="/"/> :
+        accessToken ? <Navigate to="/"/> :
             <AnimationWrapper keyValue={type}>
                 <section className="h-cover flex items-center justify-center">
                     <Toaster/>

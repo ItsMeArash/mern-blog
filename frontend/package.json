@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
     "@editorjs/code": "^2.8.0",
     "@editorjs/editorjs": "^2.27.2",
     "@editorjs/embed": "^2.5.3",

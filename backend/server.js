@@ -6,8 +6,9 @@ import {nanoid} from "nanoid";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import admin from "firebase-admin";
-import serviceAccountKey from "./mern-blog-6eb87-firebase-adminsdk-6wi4s-40de442b11.json" assert {type: "json"}
+// import serviceAccountKey from "./mern-blog-6eb87-firebase-adminsdk-6wi4s-40de442b11.json" assert {type: "json"}
 import {getAuth} from "firebase-admin/auth";
+import aws from "aws-sdk";
 
 // Schemas
 import User from "./Schema/User.js";
@@ -16,7 +17,8 @@ const server = express();
 let PORT = 3000;
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccountKey)
+    // credential: admin.credential.cert(serviceAccountKey)
+    credential: admin.credential.cert({})
 })
 
 let emailRegex = /^\w+([\.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
@@ -28,6 +30,24 @@ server.use(cors());
 mongoose.connect(process.env.DB_LOCATION, {
     autoIndex: true,
 });
+
+const s3 = new aws.S3({
+    region: "default",
+    accessKeyId: process.env.LIARA_ACCESS_KEY,
+    secretAccessKey: process.env.LIARA_SECRET_KEY
+})
+
+const generateUploadUrl = async () => {
+    const date = new Date();
+    const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
+
+    return await s3.getSignedUrlPromise("putObject", {
+        Bucket: "itsmearash",
+        Key: imageName,
+        Expires: 1000,
+        ContentType: "image/jpeg"
+    })
+}
 
 const formatDataToSend = (user) => {
     const accessToken = jwt.sign({id: user._id}, process.env.SECRET_ACCESS_KEY);
@@ -50,6 +70,15 @@ const generateUsername = async (email) => {
     return username;
 
 }
+
+server.get("/get-upload-url", (req, res) => {
+    console.log('req sent')
+    generateUploadUrl().then(url => res.status(200).json({uploadUrl: url}))
+        .catch(err => {
+            console.log(err.message);
+            return(res.status(500).json({error: err.message}));
+        })
+})
 
 server.post("/signup", (req, res) => {
     const {fullname, email, password} = req.body;
@@ -121,10 +150,10 @@ server.post("/signin", (req, res) => {
 })
 
 server.post("/google-auth", async (req, res) => {
-    const {accessToken} = req.body;
+    const {idToken} = req.body;
 
     getAuth()
-        .verifyIdToken(accessToken)
+        .verifyIdToken(idToken)
         .then(async (decodedUser) => {
             let {email, name} = decodedUser;
             console.log({decodedUser})
@@ -157,7 +186,10 @@ server.post("/google-auth", async (req, res) => {
 
             return res.status(200).json(formatDataToSend(user))
         })
-        .catch(err => res.status(500).json({"error": "Failed to authenticate you with Google!"}))
+        .catch(err => {
+            console.log(err)
+            return res.status(500).json({"error": "Failed to authenticate you with Google!"})
+        })
 })
 
 server.listen(PORT, () => {
