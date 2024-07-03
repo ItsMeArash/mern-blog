@@ -1,11 +1,13 @@
 import AnimationWrapper from "../common/page-animation.jsx";
-import {Toaster} from "react-hot-toast";
+import {toast, Toaster} from "react-hot-toast";
 import {useContext} from "react";
 import {EditorContext} from "../pages/editor.pages.jsx";
+import Tag from "./tags.component.jsx";
 
 const PublishForm = () => {
     const {blog, blog: {banner, title, tags, des}, setEditorState, setBlog} = useContext(EditorContext);
     const characterLimit = 200;
+    const tagLimit = 10;
     const handleCloseEvent = () => {
         setEditorState("editor");
     }
@@ -16,11 +18,29 @@ const PublishForm = () => {
         setBlog({...blog, [input.name]: input.value});
     }
 
-    const handleKeyDown = (event) => {
+    const handleTitleKeyDown = (event) => {
         if (event.keyCode === 13) {
             event.preventDefault();
         }
     }
+
+     const handleKeyDown = (event) => {
+        if (event.keyCode === 13 || event.keyCode === 188) {
+            event.preventDefault();
+
+            const tag = event.target.value;
+
+            if (tags.length < tagLimit) {
+                if (!tags.includes(tag) && tag.length) {
+                    setBlog({...blog, tags: [...tags, tag]})
+                }
+            } else {
+                toast.error("Tags count limit reached!")
+            }
+
+            event.target.value = '';
+        }
+     }
 
     return (
         <AnimationWrapper>
@@ -60,14 +80,23 @@ const PublishForm = () => {
                               name="des"
                               className="h-40 resize-none leading-7 input-box pl-4 "
                               onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}></textarea>
-                    <p className="mt-1 text-dark-grey text-sm text-right">{characterLimit - des.length} Characters left</p>
+                              onKeyDown={handleTitleKeyDown}></textarea>
+                    <p className="mt-1 text-dark-grey text-sm text-right">{characterLimit - des.length} Characters
+                        left</p>
 
                     <p className="text-dark-grey mb-2 mt-9">Topics - (Helps is searching and ranking your blog post)</p>
 
                     <div className="relative input-box pl-2 py-2 pb-4 ">
-                        <input type="text" placeholder="Topics" className="sticky input-box bg-white top-0 left-0 pl-4 mb-3"/>
+                        <input type="text" placeholder="Topics"
+                               className="sticky input-box bg-white top-0 left-0 pl-4 mb-3 focus:bg-white"
+                               onKeyDown={handleKeyDown}/>
+                        {
+                            tags.map((tag, index) => (
+                                <Tag tag={tag} key={index}/>
+                            ))
+                        }
                     </div>
+
                 </div>
             </section>
         </AnimationWrapper>
