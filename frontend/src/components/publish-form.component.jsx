@@ -24,7 +24,7 @@ const PublishForm = () => {
         }
     }
 
-     const handleKeyDown = (event) => {
+    const handleKeyDown = (event) => {
         if (event.keyCode === 13 || event.keyCode === 188) {
             event.preventDefault();
 
@@ -40,7 +40,7 @@ const PublishForm = () => {
 
             event.target.value = '';
         }
-     }
+    }
 
     return (
         <AnimationWrapper>
@@ -92,11 +92,13 @@ const PublishForm = () => {
                                onKeyDown={handleKeyDown}/>
                         {
                             tags.map((tag, index) => (
-                                <Tag tag={tag} key={index}/>
+                                <Tag tag={tag} key={index} tagIndex={index}/>
                             ))
                         }
                     </div>
+                    <p className="mt-1 mb-4 text-dark-grey text-right">{tagLimit - tags.length} Tags left</p>
 
+                    <button className="btn-dark px-8">Publish</button>
                 </div>
             </section>
         </AnimationWrapper>
