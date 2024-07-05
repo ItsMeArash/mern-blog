@@ -12,6 +12,7 @@ import aws from "aws-sdk";
 
 // Schemas
 import User from "./Schema/User.js";
+import Blog from "./Schema/Blog.js";
 
 const server = express();
 let PORT = 3000;
@@ -71,12 +72,28 @@ const generateUsername = async (email) => {
 
 }
 
+const verifyJWT = (req, res, next) => {
+    const authHeaders = req.header('authorization');
+    const token = authHeaders && authHeaders.split(" ")[1];
+    if (token === null) {
+        return res.status(401).json({"error": "No access token!"})
+    }
+    jwt.verify(token, process.env.SECRET_ACCESS_KEY, (err, user) => {
+        if (err) {
+            return res.status(403).json({"error": "Access token is invalid!"})
+        }
+
+        req.user = user.id;
+        next();
+    })
+}
+
 server.get("/get-upload-url", (req, res) => {
     console.log('req sent')
     generateUploadUrl().then(url => res.status(200).json({uploadUrl: url}))
         .catch(err => {
             console.log(err.message);
-            return(res.status(500).json({error: err.message}));
+            return (res.status(500).json({error: err.message}));
         })
 })
 
@@ -190,6 +207,51 @@ server.post("/google-auth", async (req, res) => {
             console.log(err)
             return res.status(500).json({"error": "Failed to authenticate you with Google!"})
         })
+})
+
+server.post("/create-blog", verifyJWT, (req, res) => {
+    const authorID = req.user;
+    const {title, des, banner, content, draft} = req.body;
+    let {tags} = req.body;
+
+    // blog fields validation
+    if (!title.length) {
+        return res.status(403).json({"error": "You must provide a title to publish the blog"});
+    }
+    if (!des.length || des.length > 200) {
+        return res.status(403).json({"error": "You  must provide a valid blog description."});
+    }
+    if (!banner.length) {
+        return res.status(403).json({"json": "You must provide a valid banner for your blog."});
+    }
+    if (!content.blocks.length) {
+        return res.status(403).json({"error": "There must be some blog content to publish it!"});
+    }
+    if (!tags.length || tags.length > 10) {
+        return res.status(403).json({"error": "Invalid count of tags"});
+    }
+
+    tags = tags.map(tag => tag.toLowerCase());
+
+    const blogID = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, '-').trim() + nanoid();
+
+    const blog = new Blog({
+        title, des, banner, content, tags, author: authorID, blog_id: blogID, draft: Boolean(draft)
+    })
+
+    blog?.save().then(blog => {
+        const incrementValue = draft ? 0 : 1;
+        User.findOneAndUpdate({_id: authorID}, {
+            $inc: {"account_info.total_posts": incrementValue},
+            $push: {"blogs": blog._id}
+        }).then(user => {
+            return res.status(200).json({id: blog.blog_id})
+        }).catch(err => {
+            return res.status(500).json({"error": "Failed to update total post number!"});
+        })
+    }).catch(err => {
+        return res.status(500).json({"error": err.message});
+    })
 })
 
 server.listen(PORT, () => {
