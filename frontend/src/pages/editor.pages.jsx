@@ -10,17 +10,17 @@ const blogStructure = {
     content: [],
     tags: [],
     des: "",
-    author: {personal_info: {}}
-}
+    author: {personal_info: {}},
+};
 
-export const EditorContext = createContext({})
+export const EditorContext = createContext({});
 
 const Editor = () => {
     const [blog, setBlog] = useState(blogStructure);
     const [editorState, setEditorState] = useState("editor");
-    const [textEditor, setTextEditor] = useState({isReady: false})
+    const [textEditor, setTextEditor] = useState({isReady: false});
+    const {userAuth: {accessToken}} = useContext(UserContext);
 
-    const {userAuth: {accessToken}} = useContext(UserContext)
     return (
         <EditorContext.Provider value={{blog, setBlog, editorState, setEditorState, textEditor, setTextEditor}}>
             {

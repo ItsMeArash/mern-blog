@@ -3,7 +3,7 @@ import googleIcon from "../imgs/google.png"
 import {Link, Navigate} from "react-router-dom";
 import AnimationWrapper from "../common/page-animation.jsx";
 import {useTranslation} from "react-i18next";
-import {toast, Toaster} from "react-hot-toast";
+import {toast} from "react-hot-toast";
 import axios from "axios";
 import {storeInSession} from "../common/session.jsx";
 import {useContext} from "react";
@@ -85,7 +85,6 @@ const UserAuthForm = ({type}) => {
         accessToken ? <Navigate to="/"/> :
             <AnimationWrapper keyValue={type}>
                 <section className="h-cover flex items-center justify-center">
-                    <Toaster/>
                     <form className="w-[80%] max-w-[400px]" onSubmit={handleSubmit}>
                         <h1 className="text-4xl capitalize text-center mb-24">
                             {t("auth.greeting")}

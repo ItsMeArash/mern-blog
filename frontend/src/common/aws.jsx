@@ -1,26 +1,24 @@
 import axios from "axios";
 
-const uploadImage = async (image) => {
-    let imageUrl = null;
-    console.log(import.meta.env.VITE_SERVER_DOMAIN)
-    await axios.get(import.meta.env.VITE_SERVER_DOMAIN + "/get-upload-url")
-        .then(async ({data: {uploadUrl}}) => {
-            console.log(uploadUrl)
-            await axios({
-                method: "PUT",
-                url: uploadUrl,
-                headers: {"Content-Type": "multipart/form-data"},
-                data: image
-            }).then(() => {
-                imageUrl = uploadUrl.split("?")[0];
-            }).catch(err => {
-                console.log(err)
-            })
-        })
+export const uploadImage = async (image) => {
+    if (image) {
+        try {
+            const imageBlob = new Blob([image], { type: image.type });
 
-    return imageUrl;
-}
+            const formData = new FormData();
+            formData.append('image', imageBlob, image.name);
 
-export {
-    uploadImage,
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_DOMAIN}/upload-image`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return(response.data.url)
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            throw error;
+        }
+    } else {
+        console.error('No image provided');
+    }
 };

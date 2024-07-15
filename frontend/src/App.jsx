@@ -4,6 +4,7 @@ import {Route, Routes} from "react-router-dom";
 import UserAuthForm from "./pages/userAuthForm.page.jsx";
 import {lookInSession} from "./common/session.jsx";
 import Editor from "./pages/editor.pages.jsx";
+import {Toaster} from "react-hot-toast";
 
 export const UserContext = createContext({});
 
@@ -35,6 +36,7 @@ const App = () => {
                     <Route path="signup" element={<UserAuthForm type='sign-up'/>}/>
                 </Route>
             </Routes>
+            <Toaster/>
         </UserContext.Provider>
     )
 }

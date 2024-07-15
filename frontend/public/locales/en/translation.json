@@ -19,6 +19,18 @@
     "password": "Password"
   },
   "article": {
-    "write": "Write"
+    "write": "Write",
+    "body-placeholder": "Let's write an awesome story...",
+    "new": "New Blog",
+    "publish": "Publish",
+    "draft": "Save Draft",
+    "title": "Blog Title"
+  },
+  "toast": {
+    "uploading": "Uploading...",
+    "uploaded": "Uploaded 👍",
+    "no-title": "Write blog title to publish it!",
+    "no-banner": "Upload a blog banner to publish it!",
+    "no-content": "Blog content can't be empty!"
   }
 }

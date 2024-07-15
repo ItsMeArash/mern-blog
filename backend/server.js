@@ -9,13 +9,16 @@ import admin from "firebase-admin";
 // import serviceAccountKey from "./mern-blog-6eb87-firebase-adminsdk-6wi4s-40de442b11.json" assert {type: "json"}
 import {getAuth} from "firebase-admin/auth";
 import aws from "aws-sdk";
+import {S3Client, PutObjectCommand, GetObjectCommand} from "@aws-sdk/client-s3";
+import multer from "multer"
 
 // Schemas
 import User from "./Schema/User.js";
 import Blog from "./Schema/Blog.js";
+import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 
 const server = express();
-let PORT = 3000;
+const PORT = 3000;
 
 admin.initializeApp({
     // credential: admin.credential.cert(serviceAccountKey)
@@ -28,14 +31,20 @@ let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 server.use(express.json());
 server.use(cors());
 
+const storage = multer.memoryStorage();
+const upload = multer({storage: storage});
+
 mongoose.connect(process.env.DB_LOCATION, {
     autoIndex: true,
 });
 
-const s3 = new aws.S3({
+const s3Client = new S3Client({
     region: "default",
-    accessKeyId: process.env.LIARA_ACCESS_KEY,
-    secretAccessKey: process.env.LIARA_SECRET_KEY
+    endpoint: process.env.LIARA_ENDPOINT,
+    credentials: {
+        accessKeyId: process.env.LIARA_ACCESS_KEY,
+        secretAccessKey: process.env.LIARA_SECRET_KEY
+    },
 })
 
 const generateUploadUrl = async () => {
@@ -88,14 +97,46 @@ const verifyJWT = (req, res, next) => {
     })
 }
 
-server.get("/get-upload-url", (req, res) => {
-    console.log('req sent')
-    generateUploadUrl().then(url => res.status(200).json({uploadUrl: url}))
-        .catch(err => {
-            console.log(err.message);
-            return (res.status(500).json({error: err.message}));
-        })
-})
+// server.get("/get-upload-url", (req, res) => {
+//     generateUploadUrl().then(url => res.status(200).json({uploadUrl: url}))
+//         .catch(err => {
+//             console.log(err.message);
+//             return (res.status(500).json({error: err.message}));
+//         })
+// })
+
+server.post('/upload-image', upload.single('image'), async (req, res) => {
+    const imageBlob = req.file;
+
+    if (imageBlob) {
+        const uniqueKey = `${imageBlob.originalname}-${nanoid()}`;
+        const params = {
+            Bucket: process.env.LIARA_BUCKET_NAME,
+            Key: uniqueKey,
+            Body: imageBlob.buffer,
+            ContentType: imageBlob.mimetype,
+        };
+
+        try {
+            const data = await s3Client.send(new PutObjectCommand(params));
+            console.log(data);
+            const urlparams = {
+                Bucket: process.env.LIARA_BUCKET_NAME,
+                Key: uniqueKey,
+            };
+
+            const command = new GetObjectCommand(urlparams);
+            getSignedUrl(s3Client, command).then((url) => {
+                return res.status(200).json({ file: 'okkk', url: url });
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error uploading to S3' });
+        }
+    } else {
+        return res.status(400).json({error: 'No file uploaded'});
+    }
+});
 
 server.post("/signup", (req, res) => {
     const {fullname, email, password} = req.body;

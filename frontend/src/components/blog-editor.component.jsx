@@ -4,12 +4,14 @@ import logo from "../imgs/logo.png";
 import defaultBanner from "../imgs/blog banner.png"
 import {uploadImage} from "../common/aws.jsx";
 import {useContext, useEffect} from "react";
-import {toast, Toaster} from "react-hot-toast";
+import {toast} from "react-hot-toast";
 import {EditorContext} from "../pages/editor.pages.jsx";
 import EditorJS from "@editorjs/editorjs";
 import {tools} from "./tools.component.jsx";
 import axios from "axios";
 import {UserContext} from "../App.jsx";
+import {useTranslation} from "react-i18next";
+import LanguageSelector from "./languageSelector.jsx";
 
 const BlogEditor = () => {
     const {
@@ -21,8 +23,8 @@ const BlogEditor = () => {
         setEditorState,
     } = useContext(EditorContext);
     const {userAuth: {accessToken}} = useContext(UserContext);
-
     const navigate = useNavigate();
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (!textEditor.isReady) {
@@ -30,7 +32,7 @@ const BlogEditor = () => {
                 holder: "textEditor",
                 data: content,
                 tools: tools,
-                placeholder: "Let's write an awesome story..."
+                placeholder: t("article.body-placeholder"),
             }));
         }
     }, []);
@@ -47,42 +49,41 @@ const BlogEditor = () => {
         input.style.height = "auto"
         input.style.height = `${input.scrollHeight}px`;
 
-        setBlog({...blog, title: input.value})
+        setBlog({...blog, title: input.value});
     }
 
     const handleBannerUpload = (event) => {
         const image = event.target.files[0];
         if (image) {
-            let loadingToast = toast.loading('Uploading...');
+            let loadingToast = toast.loading(t("toast.uploading"));
             uploadImage(image).then(url => {
                 if (url) {
                     toast.dismiss(loadingToast);
-                    toast.success("Uploaded!👍")
+                    toast.success(t("toast.uploaded"));
                     setBlog({...blog, banner: url});
                 }
             }).catch((err) => {
                 toast.dismiss(loadingToast);
-                return toast.error(err)
+                return toast.error(err);
             });
         }
     }
 
     const handlePublishEvent = () => {
-        // if (!banner.length) {
-        //     return toast.error("Upload a blog banner to publish it!")
-        // }
-        //
-        // if (!title.length) {
-        //     return toast.error("Write blog title to publish it!")
-        // }
+        if (!banner.length) {
+            return toast.error(t("toast.no-banner"));
+        }
+        if (!title.length) {
+            return toast.error(t("toast.no-title"));
+        }
 
         if (textEditor.isReady) {
             textEditor.save().then(data => {
                 if (data.blocks.length) {
                     setBlog({...blog, content: data});
-                    setEditorState("publish")
+                    setEditorState("publish");
                 } else {
-                    toast.error('Write something in your blog to publish it!')
+                    toast.error(t("toast.no-content"));
                 }
             }).catch((err) => {
                 console.log(err)
@@ -135,16 +136,15 @@ const BlogEditor = () => {
                 <Link to="/" className="flex-none w-10">
                     <img src={logo} alt="logo"/>
                 </Link>
-                <p className="max-md:hidden text-black line-clamp-1 w-full">
-                    {title || "New Blog"}
+                <p className="max-md:hidden text-black font-bold text-xl line-clamp-1 w-full">
+                    {title || t("article.new")}
                 </p>
-
+                <LanguageSelector/>
                 <div className="flex gap-4 ml-auto">
-                    <button className="btn-dark py-2" onClick={handlePublishEvent}>Publish</button>
-                    <button className="btn-light py-2" onClick={saveDraft}>Save Draft</button>
+                    <button className="btn-dark py-2" onClick={handlePublishEvent}>{t("article.publish")}</button>
+                    <button className="btn-light py-2" onClick={saveDraft}>{t("article.draft")}</button>
                 </div>
             </nav>
-            <Toaster/>
             <AnimationWrapper>
                 <section>
                     <div className="mx-auto max-w-[900px] w-full">
@@ -157,16 +157,13 @@ const BlogEditor = () => {
                             </label>
                         </div>
                         <textarea defaultValue={title}
-                                  placeholder="Blog Title"
+                                  placeholder={t("article.title")}
                                   className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40"
                                   onKeyDown={handleTitleKeyDown}
                                   onChange={handleTitleChange}>
                         </textarea>
-
                         <hr className="w-full opacity-10 my-5"/>
-
                         <div id="textEditor" className="font-gelasio">
-
                         </div>
                     </div>
                 </section>
