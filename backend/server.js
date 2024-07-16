@@ -127,11 +127,11 @@ server.post('/upload-image', upload.single('image'), async (req, res) => {
 
             const command = new GetObjectCommand(urlparams);
             getSignedUrl(s3Client, command).then((url) => {
-                return res.status(200).json({ file: 'okkk', url: url });
+                return res.status(200).json({file: 'okkk', url: url});
             });
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ error: 'Error uploading to S3' });
+            return res.status(500).json({error: 'Error uploading to S3'});
         }
     } else {
         return res.status(400).json({error: 'No file uploaded'});
@@ -247,6 +247,22 @@ server.post("/google-auth", async (req, res) => {
         .catch(err => {
             console.log(err)
             return res.status(500).json({"error": "Failed to authenticate you with Google!"})
+        })
+})
+
+server.get("/latest-blogs", (req, res) => {
+    const maxLimit = 5;
+
+    Blog.find({draft: false})
+        .populate("author", "personal_info.profile_img personal_info.username personal_info.fullname -_id")
+        .sort({"publishedAt": -1})
+        .select("blog_id title des banner activity tags publishedAt -_id")
+        .limit(maxLimit)
+        .then(blogs => {
+            return res.status(200).json({blogs});
+        })
+        .catch(err => {
+            return res.status(500).json({error: err.message});
         })
 })
 
