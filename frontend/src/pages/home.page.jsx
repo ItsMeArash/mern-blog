@@ -5,13 +5,14 @@ import {useEffect, useState} from "react";
 import Loader from "../components/loader.component.jsx";
 import BlogPostCard from "../components/blog-post.component.jsx";
 import MinimalBlogPost from "../components/nobanner-blog-post.component.jsx";
+import NoDataMessage from "../components/nodata.component.jsx";
 
 const HomePage = () => {
     const [blogs, setBlogs] = useState(null);
     const [trendingBlogs, setTrendingBlogs] = useState(null);
     const [pageState, setPageState] = useState("home");
 
-    const categories = ["programming", "hollywood", "film making", "social media", "cooking", "tech", "finances", "travel"];
+    const categories = ["programming", "hollywood", "film making", "social media", "cooking", "tech", "finance", "travel"];
 
     const fetchLatestBlogs = () => {
         axios.get(import.meta.env.VITE_SERVER_DOMAIN + "/latest-blogs")
@@ -22,6 +23,17 @@ const HomePage = () => {
                 console.log(err);
             })
     }
+
+    const fetchBlogsByCategory = () => {
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs", {tag: pageState})
+            .then((response) => {
+                setBlogs(response.data.blogs);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }
+
     const fetchTrendingBlogs = () => {
         axios.get(import.meta.env.VITE_SERVER_DOMAIN + "/trending-blogs")
             .then((response) => {
@@ -47,6 +59,8 @@ const HomePage = () => {
 
         if (pageState === "home") {
             fetchLatestBlogs();
+        } else {
+            fetchBlogsByCategory();
         }
         if (!trendingBlogs) {
             fetchTrendingBlogs();
@@ -63,21 +77,30 @@ const HomePage = () => {
                         <>
                             {
                                 blogs === null ? <Loader/> : (
-                                    blogs?.map((blog, index) => (
-                                        <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.1}}>
-                                            <BlogPostCard content={blog} author={blog.author.personal_info}/>
-                                        </AnimationWrapper>
-                                    ))
+                                    blogs.length ? (
+                                        blogs?.map((blog, index) => (
+                                            <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.1}}>
+                                                <BlogPostCard content={blog} author={blog.author.personal_info}/>
+                                            </AnimationWrapper>
+                                        ))
+                                    ) : (
+                                        <NoDataMessage message="No Blogs published!"/>
+                                    )
+
                                 )
                             }
                         </>
                         {
                             trendingBlogs === null ? <Loader/> : (
-                                trendingBlogs?.map((blog, index) => (
-                                    <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.1}}>
-                                        <MinimalBlogPost blog={blog} index={index}/>
-                                    </AnimationWrapper>
-                                ))
+                                trendingBlogs.length ? (
+                                    trendingBlogs?.map((blog, index) => (
+                                        <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.1}}>
+                                            <MinimalBlogPost blog={blog} index={index}/>
+                                        </AnimationWrapper>
+                                    ))
+                                ) : (
+                                    <NoDataMessage message="No trending blogs!"/>
+                                )
                             )
                         }
                     </InPageNavigation>
@@ -106,11 +129,15 @@ const HomePage = () => {
                             </h1>
                             {
                                 trendingBlogs === null ? <Loader/> : (
-                                    trendingBlogs?.map((blog, index) => (
-                                        <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.1}}>
-                                            <MinimalBlogPost blog={blog} index={index}/>
-                                        </AnimationWrapper>
-                                    ))
+                                    trendingBlogs.length ? (
+                                        trendingBlogs?.map((blog, index) => (
+                                            <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.1}}>
+                                                <MinimalBlogPost blog={blog} index={index}/>
+                                            </AnimationWrapper>
+                                        ))
+                                    ) : (
+                                        <NoDataMessage message="No trending blogs!"/>
+                                    )
                                 )
                             }
                         </div>
