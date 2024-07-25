@@ -6,6 +6,8 @@ import Loader from "../components/loader.component.jsx";
 import BlogPostCard from "../components/blog-post.component.jsx";
 import MinimalBlogPost from "../components/nobanner-blog-post.component.jsx";
 import NoDataMessage from "../components/nodata.component.jsx";
+import {filterPaginationData} from "../common/filter-pagination-data.jsx";
+import LoadMoreDataBtn from "../components/load-more.component.jsx";
 
 const HomePage = () => {
     const [blogs, setBlogs] = useState(null);
@@ -14,20 +16,38 @@ const HomePage = () => {
 
     const categories = ["programming", "hollywood", "film making", "social media", "cooking", "tech", "finance", "travel"];
 
-    const fetchLatestBlogs = () => {
-        axios.get(import.meta.env.VITE_SERVER_DOMAIN + "/latest-blogs")
-            .then((response) => {
-                setBlogs(response.data.blogs);
+    const fetchLatestBlogs = ({page = 1}) => {
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/latest-blogs", {page})
+            .then(async ({data}) => {
+                console.log(data.blogs)
+                const formattedData = await filterPaginationData({
+                    state: blogs,
+                    data: data.blogs,
+                    page: page,
+                    countRoute: "/all-latest-blogs-count"
+                });
+
+                console.log(formattedData);
+                setBlogs(formattedData);
             })
             .catch(err => {
                 console.log(err);
             })
     }
 
-    const fetchBlogsByCategory = () => {
-        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs", {tag: pageState})
-            .then((response) => {
-                setBlogs(response.data.blogs);
+    const fetchBlogsByCategory = ({page = 1}) => {
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs", {tag: pageState, page})
+            .then(async ({data}) => {
+                const formattedData = await filterPaginationData({
+                    state: blogs,
+                    data: data.blogs,
+                    page: page,
+                    countRoute: "/search-blogs-count",
+                    data_to_send: {tag: pageState}
+                });
+
+                console.log(formattedData);
+                setBlogs(formattedData);
             })
             .catch(err => {
                 console.log(err);
@@ -58,9 +78,9 @@ const HomePage = () => {
         activeTabRef.current.click();
 
         if (pageState === "home") {
-            fetchLatestBlogs();
+            fetchLatestBlogs({page: 1});
         } else {
-            fetchBlogsByCategory();
+            fetchBlogsByCategory({page: 1});
         }
         if (!trendingBlogs) {
             fetchTrendingBlogs();
@@ -77,9 +97,10 @@ const HomePage = () => {
                         <>
                             {
                                 blogs === null ? <Loader/> : (
-                                    blogs.length ? (
-                                        blogs?.map((blog, index) => (
-                                            <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.1}}>
+                                    blogs.results.length ? (
+                                        blogs.results.map((blog, index) => (
+                                            <AnimationWrapper key={index}
+                                                              transition={{duration: 1, delay: index * 0.1}}>
                                                 <BlogPostCard content={blog} author={blog.author.personal_info}/>
                                             </AnimationWrapper>
                                         ))
@@ -89,6 +110,7 @@ const HomePage = () => {
 
                                 )
                             }
+                            <LoadMoreDataBtn state={blogs} fetchData={(pageState === "home" ? fetchLatestBlogs : fetchBlogsByCategory)}/>
                         </>
                         {
                             trendingBlogs === null ? <Loader/> : (
@@ -131,7 +153,8 @@ const HomePage = () => {
                                 trendingBlogs === null ? <Loader/> : (
                                     trendingBlogs.length ? (
                                         trendingBlogs?.map((blog, index) => (
-                                            <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.1}}>
+                                            <AnimationWrapper key={index}
+                                                              transition={{duration: 1, delay: index * 0.1}}>
                                                 <MinimalBlogPost blog={blog} index={index}/>
                                             </AnimationWrapper>
                                         ))
