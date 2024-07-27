@@ -312,7 +312,7 @@ server.post("/search-blogs", (req, res) => {
         })
 })
 
-server.post("/search=blogs-count", (req, res) => {
+server.post("/search-blogs-count", (req, res) => {
     const {tag} =- req.body;
     const findQuery = {tags: tag, draft: false};
 

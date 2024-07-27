@@ -19,15 +19,12 @@ const HomePage = () => {
     const fetchLatestBlogs = ({page = 1}) => {
         axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/latest-blogs", {page})
             .then(async ({data}) => {
-                console.log(data.blogs)
                 const formattedData = await filterPaginationData({
                     state: blogs,
                     data: data.blogs,
                     page: page,
                     countRoute: "/all-latest-blogs-count"
                 });
-
-                console.log(formattedData);
                 setBlogs(formattedData);
             })
             .catch(err => {
@@ -45,8 +42,6 @@ const HomePage = () => {
                     countRoute: "/search-blogs-count",
                     data_to_send: {tag: pageState}
                 });
-
-                console.log(formattedData);
                 setBlogs(formattedData);
             })
             .catch(err => {
