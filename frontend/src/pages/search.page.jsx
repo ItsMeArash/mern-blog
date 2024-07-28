@@ -11,6 +11,7 @@ import LoadMoreDataBtn from "../components/load-more.component.jsx";
 
 const SearchPage = () => {
     const [blogs, setBlogs] = useState(null);
+    const [users, setUsers] = useState(null);
     const {query} = useParams();
 
     const searchBlogs = ({page = 1, create_new_arr = false}) => {
@@ -33,11 +34,20 @@ const SearchPage = () => {
 
     const resetStates = () => {
         setBlogs(null);
+        setUsers(null);
+    }
+
+    const fetchUsers = () => {
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/search-users", {query})
+            .then(({data: {users}}) => {
+                setUsers(users);
+            })
     }
 
     useEffect(() => {
         resetStates();
         searchBlogs({page: 1, create_new_arr: true});
+        fetchUsers();
     }, [query]);
 
     return (
