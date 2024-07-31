@@ -1,6 +1,6 @@
 import InputBox from "../components/input.component.jsx";
 import googleIcon from "../imgs/google.png"
-import {Link, Navigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 import AnimationWrapper from "../common/page-animation.jsx";
 import {useTranslation} from "react-i18next";
 import {toast} from "react-hot-toast";
@@ -13,7 +13,7 @@ import {authWithGoogle} from "../common/firebase.jsx";
 const UserAuthForm = ({type}) => {
     const {t} = useTranslation();
 
-    const {userAuth: {accessToken}, setUserAuth} = useContext(UserContext);
+    const {setUserAuth} = useContext(UserContext);
     const userAuthThroughServer = (serverRoute, formData) => {
         axios.post(import.meta.env.VITE_SERVER_DOMAIN + serverRoute, formData)
             .then(({data}) => {
@@ -82,66 +82,65 @@ const UserAuthForm = ({type}) => {
     }
 
     return (
-        accessToken ? <Navigate to="/"/> :
-            <AnimationWrapper keyValue={type}>
-                <section className="h-cover flex items-center justify-center">
-                    <form className="w-[80%] max-w-[400px]" onSubmit={handleSubmit}>
-                        <h1 className="text-4xl capitalize text-center mb-24">
-                            {t("auth.greeting")}
-                        </h1>
+        <AnimationWrapper keyValue={type}>
+            <section className="h-cover flex items-center justify-center">
+                <form className="w-[80%] max-w-[400px]" onSubmit={handleSubmit}>
+                    <h1 className="text-4xl capitalize text-center mb-24">
+                        {t("auth.greeting")}
+                    </h1>
 
-                        {
-                            type !== "sign-in" && <InputBox name="fullname"
-                                                            type="text"
-                                                            placeholder={t("account.fullName")}
-                                                            icon="fi-rr-user"/>
-                        }
-                        <InputBox name="email"
-                                  type="email"
-                                  placeholder={t("account.email")}
-                                  icon="fi-rr-envelope"/>
+                    {
+                        type !== "sign-in" && <InputBox name="fullname"
+                                                        type="text"
+                                                        placeholder={t("account.fullName")}
+                                                        icon="fi-rr-user"/>
+                    }
+                    <InputBox name="email"
+                              type="email"
+                              placeholder={t("account.email")}
+                              icon="fi-rr-envelope"/>
 
-                        <InputBox name="password"
-                                  type="password"
-                                  placeholder={t("account.password")}
-                                  icon="fi-rr-key"/>
+                    <InputBox name="password"
+                              type="password"
+                              placeholder={t("account.password")}
+                              icon="fi-rr-key"/>
 
-                        <button className="btn-dark center mt-14"
-                                type="submit">
-                            {type === "sign-in" ? t("auth.signin") : t("auth.signup")}
-                        </button>
+                    <button className="btn-dark center mt-14"
+                            type="submit">
+                        {type === "sign-in" ? t("auth.signin") : t("auth.signup")}
+                    </button>
 
-                        <div
-                            className="relative w-full flex items-center gap-2 my-10 opacity-10 uppercase text-black font-bold">
-                            <hr className="w-1/2 border-black"/>
-                            <p>{t("auth.or")}</p>
-                            <hr className="w-1/2 border-black"/>
-                        </div>
+                    <div
+                        className="relative w-full flex items-center gap-2 my-10 opacity-10 uppercase text-black font-bold">
+                        <hr className="w-1/2 border-black"/>
+                        <p>{t("auth.or")}</p>
+                        <hr className="w-1/2 border-black"/>
+                    </div>
 
-                        <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
-                                onClick={handleGoogleAuth}>
-                            <img src={googleIcon} alt="Google Icon" className="w-5"/>
-                            {t("auth.googleSignin")}
-                        </button>
+                    <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
+                            onClick={handleGoogleAuth}>
+                        <img src={googleIcon} alt="Google Icon" className="w-5"/>
+                        {t("auth.googleSignin")}
+                    </button>
 
-                        {
-                            type === "sign-in" ?
-                                <p className="mt-6 text-dark-grey text-xl text-center">
-                                    {t("auth.notAccount")}
-                                    <Link to="/signup" className="underline text-black text-xl ml-1">
-                                        {t("auth.join")}
-                                    </Link>
-                                </p> :
-                                <p className="mt-6 text-dark-grey text-xl text-center">
-                                    {t("auth.account")}
-                                    <Link to="/signin" className="underline text-black text-xl ml-1">
-                                        {t("auth.enter")}
-                                    </Link>
-                                </p>
-                        }
-                    </form>
-                </section>
-            </AnimationWrapper>
+                    {
+                        type === "sign-in" ?
+                            <p className="mt-6 text-dark-grey text-xl text-center">
+                                {t("auth.notAccount")}
+                                <Link to="/signup" className="underline text-black text-xl ml-1">
+                                    {t("auth.join")}
+                                </Link>
+                            </p> :
+                            <p className="mt-6 text-dark-grey text-xl text-center">
+                                {t("auth.account")}
+                                <Link to="/signin" className="underline text-black text-xl ml-1">
+                                    {t("auth.enter")}
+                                </Link>
+                            </p>
+                    }
+                </form>
+            </section>
+        </AnimationWrapper>
     )
 }
 

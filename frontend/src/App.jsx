@@ -9,6 +9,8 @@ import HomePage from "./pages/home.page.jsx";
 import SearchPage from "./pages/search.page.jsx";
 import PageNotFound from "./pages/404.page.jsx";
 import ProfilePage from "./pages/profile.page.jsx";
+import AuthGuard from "./components/HOC/AuthGuard.jsx";
+import GuestGuard from "./components/HOC/GuestGuard.jsx";
 
 export const UserContext = createContext({});
 
@@ -34,11 +36,11 @@ const App = () => {
     return (
         <UserContext.Provider value={{userAuth, setUserAuth}}>
             <Routes>
-                <Route path="/editor" element={<Editor/>}/>
+                <Route path="/editor" element={<AuthGuard><Editor/></AuthGuard>}/>
                 <Route path="/" element={<Navbar/>}>
                     <Route index element={<HomePage/>}/>
-                    <Route path="signin" element={<UserAuthForm type='sign-in'/>}/>
-                    <Route path="signup" element={<UserAuthForm type='sign-up'/>}/>
+                    <Route path="signin" element={<GuestGuard><UserAuthForm type='sign-in'/></GuestGuard>}/>
+                    <Route path="signup" element={<GuestGuard><UserAuthForm type='sign-up'/></GuestGuard>}/>
                     <Route path="search/:query" element={<SearchPage/>}/>
                     <Route path="user/:id" element={<ProfilePage/>}/>
                     <Route path="*" element={<PageNotFound/>}/>
