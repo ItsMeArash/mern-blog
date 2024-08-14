@@ -67,7 +67,7 @@ const ProfilePage = () => {
                 setProfile(user);
             }
             setProfileLoaded(profileId);
-            getBlogs({user_id: user._id});
+            getBlogs({user_id: user?._id});
             setLoading(false);
         }).catch(err => {
             console.log(err)

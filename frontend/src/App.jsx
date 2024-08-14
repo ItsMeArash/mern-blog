@@ -11,6 +11,7 @@ import PageNotFound from "./pages/404.page.jsx";
 import ProfilePage from "./pages/profile.page.jsx";
 import AuthGuard from "./components/HOC/AuthGuard.jsx";
 import GuestGuard from "./components/HOC/GuestGuard.jsx";
+import BlogPage from "./pages/blog.page.jsx";
 
 export const UserContext = createContext({});
 
@@ -43,6 +44,7 @@ const App = () => {
                     <Route path="signup" element={<GuestGuard><UserAuthForm type='sign-up'/></GuestGuard>}/>
                     <Route path="search/:query" element={<SearchPage/>}/>
                     <Route path="user/:id" element={<ProfilePage/>}/>
+                    <Route path="blog/:blog_id" element={<BlogPage/>}/>
                     <Route path="*" element={<PageNotFound/>}/>
                 </Route>
             </Routes>

@@ -8,8 +8,7 @@ import cors from "cors";
 import admin from "firebase-admin";
 // import serviceAccountKey from "./mern-blog-6eb87-firebase-adminsdk-6wi4s-40de442b11.json" assert {type: "json"}
 import {getAuth} from "firebase-admin/auth";
-import aws from "aws-sdk";
-import {S3Client, PutObjectCommand, GetObjectCommand} from "@aws-sdk/client-s3";
+import {GetObjectCommand, PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import multer from "multer"
 
 // Schemas
@@ -415,6 +414,27 @@ server.post("/create-blog", verifyJWT, (req, res) => {
     }).catch(err => {
         return res.status(500).json({"error": err.message});
     })
+})
+
+server.post("/get-blog", (req, res) => {
+    const {blog_id} = req.body;
+    const incrementValue = 1;
+
+    Blog.findOneAndUpdate({blog_id}, {$inc: {"activity.total_reads": incrementValue}})
+        .populate("author", "personal_info.fullname personal_info.username personal_info.profile_img")
+        .select("title des content banner activity publishedAt blog_id tags")
+        .then(blog => {
+            User.findOneAndUpdate({"personal_info.username": blog.author.personal_info.username},
+                {$inc: {"account_info.total_reads": incrementValue}})
+                .catch(err => {
+                    return res.status(500).json({error: err.message})
+                })
+
+            return res.status(200).json({blog});
+        })
+        .catch(err => {
+            return res.status(500).json({error: err.message});
+        })
 })
 
 server.listen(PORT, () => {
