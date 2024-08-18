@@ -5,7 +5,7 @@ import {EditorContext} from "../pages/editor.pages.jsx";
 import Tag from "./tags.component.jsx";
 import axios from "axios";
 import {UserContext} from "../App.jsx";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 const PublishForm = () => {
     const {blog, blog: {banner, title, tags, des, content}, setEditorState, setBlog} = useContext(EditorContext);
@@ -13,6 +13,7 @@ const PublishForm = () => {
     const tagLimit = 10;
     const {userAuth: {accessToken}} = useContext(UserContext);
     const navigate = useNavigate();
+    const {blog_id} = useParams();
 
     const handleCloseEvent = () => {
         setEditorState("editor");
@@ -70,7 +71,7 @@ const PublishForm = () => {
             title, banner, des, content, tags, draft: false
         };
 
-        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/create-blog", blogObject, {
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/create-blog", {...blogObject, id: blog_id}, {
             headers: {
                 "Authorization": `Bearer ${accessToken}`
             }
