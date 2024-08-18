@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {createContext, useEffect, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 import axios from "axios";
 import AnimationWrapper from "../common/page-animation.jsx";
@@ -15,6 +15,8 @@ export const blogStructure = {
     banner: '',
     publishedAt: ''
 };
+
+export const BlogContext = createContext({});
 
 const BlogPage = () => {
     const [blog, setBlog] = useState(blogStructure);
@@ -43,29 +45,31 @@ const BlogPage = () => {
         <AnimationWrapper>
             {
                 loading ? <Loader/> : (
-                    <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
-                        <img src={banner} alt="blog banner" className="aspect-video"/>
-                        <div className="mt-12">
-                            <h2>{title}</h2>
-                            <div className="flex max-sm:flex-col justify-between my-8">
-                                <div className="flex gap-5 items-start">
-                                    <img src={profile_img} alt="user avatar" className="h-12 w-12 rounded-full"/>
+                    <BlogContext.Provider value={{blog, setBlog}}>
+                        <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
+                            <img src={banner} alt="blog banner" className="aspect-video"/>
+                            <div className="mt-12">
+                                <h2>{title}</h2>
+                                <div className="flex max-sm:flex-col justify-between my-8">
+                                    <div className="flex gap-5 items-start">
+                                        <img src={profile_img} alt="user avatar" className="h-12 w-12 rounded-full"/>
 
-                                    <p>
-                                        {fullname}
-                                        <br/>
-                                        @
-                                        <Link to={`/user/${author_username}`}
-                                                className="underline">
-                                            {author_username}
-                                        </Link>
-                                    </p>
+                                        <p>
+                                            {fullname}
+                                            <br/>
+                                            @
+                                            <Link to={`/user/${author_username}`}
+                                                  className="underline">
+                                                {author_username}
+                                            </Link>
+                                        </p>
+                                    </div>
+                                    <p className="text-dark-grey opacity-75 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5">Published on {getDay(publishedAt)}</p>
                                 </div>
-                                <p className="text-dark-grey opacity-75 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5">Published on {getDay(publishedAt)}</p>
                             </div>
+                            <BlogInteraction/>
                         </div>
-                    <BlogInteraction/>
-                    </div>
+                    </BlogContext.Provider>
                 )
             }
         </AnimationWrapper>
