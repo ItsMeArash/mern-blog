@@ -293,12 +293,12 @@ server.get("/trending-blogs", (req, res) => {
 })
 
 server.post("/search-blogs", (req, res) => {
-    const {tag, query, page, author} = req.body;
+    const {tag, query, page, author, limit, eliminate_blog} = req.body;
+    const maxLimit = limit || 2;
     let findQuery;
-    const maxLimit = 5;
 
     if (tag) {
-        findQuery = {tags: tag, draft: false};
+        findQuery = {tags: tag, draft: false, blog_id: {$ne: eliminate_blog}};
     } else if (query) {
         findQuery = {draft: false, title: new RegExp(query, 'i')};
     } else if (author) {
