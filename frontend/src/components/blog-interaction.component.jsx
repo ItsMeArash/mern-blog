@@ -2,9 +2,11 @@ import React, {useContext} from 'react';
 import {BlogContext} from "../pages/blog.page";
 import {Link} from "react-router-dom";
 import {UserContext} from "../App.jsx";
+import {toast} from "react-hot-toast";
 
 const BlogInteraction = () => {
-    const {
+    let {
+        blog,
         blog: {
             title,
             blog_id,
@@ -12,17 +14,30 @@ const BlogInteraction = () => {
             activity: {total_likes, total_comments},
             author: {personal_info: {username: author_username}}
         },
-        setBlog
+        setBlog,
+        isLikedByUser,
+        setIsLikedByUser
     } = useContext(BlogContext);
-    const {userAuth: {username}} = useContext(UserContext);
+    const {userAuth: {username, accessToken}} = useContext(UserContext);
+
+    const handleLike = () => {
+        if (accessToken) {
+            setIsLikedByUser(prev => !prev);
+            !isLikedByUser ? total_likes++ : total_likes--;
+            setBlog({...blog, activity: {...activity, total_likes}});
+        } else {
+            toast.error("Please login to like the blog!")
+        }
+    };
 
     return (
         <>
             <hr className="border-grey my-2"/>
             <div className="flex gap-6 justify-between">
                 <div className="flex gap-3 items-center">
-                    <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-grey/80">
-                        <i className="fi fi-rr-heart"></i>
+                    <button className={"w-10 h-10 rounded-full flex items-center justify-center " + (isLikedByUser ? "hover:bg-red/20 text-red" : "hover:bg-grey/80")}
+                            onClick={handleLike}>
+                        <i className={`fi fi-${isLikedByUser ? 's' : 'r'}r-heart`}></i>
                     </button>
                     <p className="text-xl text-dark-grey">{total_likes}</p>
                     <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-grey/80">
