@@ -7,6 +7,7 @@ import {getDay} from "../common/date.jsx";
 import BlogInteraction from "../components/blog-interaction.component.jsx";
 import BlogPostCard from "../components/blog-post.component.jsx";
 import BlogContent from "../components/blog-content.component.jsx";
+import CommentsContainer from "../components/comments.component.jsx";
 
 export const blogStructure = {
     title: '',
@@ -24,6 +25,8 @@ const BlogPage = () => {
     const [similarBlogs, setSimilarBlogs] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isLikedByUser, setIsLikedByUser] = useState(false);
+    const [commentsWrapper, setCommentsWrapper] = useState(false);
+    const [totalParentCommentsLoaded, setTotalParentCommentsLoaded] = useState(0);
 
     const {blog_id} = useParams();
 
@@ -39,6 +42,9 @@ const BlogPage = () => {
         setBlog(blogStructure);
         setSimilarBlogs(null);
         setLoading(true);
+        setIsLikedByUser(false);
+        // setCommentsWrapper(false);
+        setTotalParentCommentsLoaded(0);
     };
 
     useEffect(() => {
@@ -50,7 +56,11 @@ const BlogPage = () => {
         axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/get-blog", {blog_id})
             .then(({data: {blog}}) => {
                 setBlog(blog);
-                axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs", {tag: blog.tags[0], limit: 6, eliminate_blog: blog_id})
+                axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs", {
+                    tag: blog.tags[0],
+                    limit: 6,
+                    eliminate_blog: blog_id
+                })
                     .then(({data}) => {
                         setSimilarBlogs(data.blogs);
                     })
@@ -66,7 +76,17 @@ const BlogPage = () => {
         <AnimationWrapper>
             {
                 loading ? <Loader/> : (
-                    <BlogContext.Provider value={{blog, setBlog, isLikedByUser, setIsLikedByUser}}>
+                    <BlogContext.Provider value={{
+                        blog,
+                        setBlog,
+                        isLikedByUser,
+                        setIsLikedByUser,
+                        commentsWrapper,
+                        setCommentsWrapper,
+                        totalParentCommentsLoaded,
+                        setTotalParentCommentsLoaded
+                    }}>
+                        <CommentsContainer />
                         <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
                             <img src={banner} alt="blog banner" className="aspect-video"/>
                             <div className="mt-12">
@@ -113,7 +133,8 @@ const BlogPage = () => {
                                                 const {author: {personal_info}} = blog;
 
                                                 return (
-                                                    <AnimationWrapper key={index} transition={{duration: 1, delay: index * 0.08}}>
+                                                    <AnimationWrapper key={index}
+                                                                      transition={{duration: 1, delay: index * 0.08}}>
                                                         <BlogPostCard content={blog} author={personal_info}/>
                                                     </AnimationWrapper>
                                                 )
