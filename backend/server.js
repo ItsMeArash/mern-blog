@@ -14,6 +14,7 @@ import multer from "multer"
 // Schemas
 import User from "./Schema/User.js";
 import Blog from "./Schema/Blog.js";
+import Notification from "./Schema/Notification.js";
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 
 const server = express();
@@ -445,6 +446,50 @@ server.post("/get-blog", (req, res) => {
 
 
             return res.status(200).json({blog});
+        })
+        .catch(err => {
+            return res.status(500).json({error: err.message});
+        })
+})
+
+server.post("/like-blog", verifyJWT, (req, res) => {
+    const user_id = req.user;
+    const {_id, isLikedByUser} = req.body;
+    const incrementValue = !isLikedByUser ? 1 : -1;
+
+    Blog.findOneAndUpdate({_id}, {$inc: {"activity.total_likes": incrementValue}})
+        .then(blog => {
+            if (!isLikedByUser) {
+                const like = new Notification({
+                    type: "like",
+                    blog: _id,
+                    notification_for: blog.author,
+                    user: user_id
+                });
+
+                like?.save()
+                    .then(() => {
+                        return res.status(200).json({liked_by_user: true});
+                    })
+            } else {
+                Notification.findOneAndDelete({user: user_id, blog: _id, type: "like"})
+                    .then(data => {
+                        return res.status(200).json({liked_by_user: false});
+                    })
+                    .catch(err => {
+                        return res.status(500).json({error: err.message})
+                    })
+            }
+        })
+})
+
+server.post("/isliked-by-user", verifyJWT, (req, res) => {
+    const user_id = req.user;
+    const {_id} = req.body;
+
+    Notification.exists({user: user_id, type: "like", blog: _id})
+        .then(result => {
+            return res.status(200).json({result});
         })
         .catch(err => {
             return res.status(500).json({error: err.message});
