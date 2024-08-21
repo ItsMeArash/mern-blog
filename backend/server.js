@@ -535,6 +535,24 @@ server.post("/add-comment", verifyJWT, (req, res) => {
     })
 })
 
+server.post("/get-blog-comments", (req, res) => {
+    const {blog_id, skip} = req.body;
+    const maxLimit = 5;
+
+    Comment.find({blog_id, isReply: false})
+        .populate("commented_by", "personal_info.username personal_info.fullname personal_info.profile_img")
+        .skip(skip)
+        .limit(maxLimit)
+        .sort({"commentedAt": -1})
+        .then(comment => {
+            return res.status(200).json(comment);
+        })
+        .catch(err => {
+            console.log(err.message);
+            return res.status(500).json({error: err});
+        })
+})
+
 server.listen(PORT, () => {
     console.log("listening on port " + PORT);
 });

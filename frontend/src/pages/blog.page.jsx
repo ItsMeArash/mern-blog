@@ -7,7 +7,7 @@ import {getDay} from "../common/date.jsx";
 import BlogInteraction from "../components/blog-interaction.component.jsx";
 import BlogPostCard from "../components/blog-post.component.jsx";
 import BlogContent from "../components/blog-content.component.jsx";
-import CommentsContainer from "../components/comments.component.jsx";
+import CommentsContainer, {fetchComments} from "../components/comments.component.jsx";
 
 export const blogStructure = {
     title: '',
@@ -43,7 +43,7 @@ const BlogPage = () => {
         setSimilarBlogs(null);
         setLoading(true);
         setIsLikedByUser(false);
-        // setCommentsWrapper(false);
+        setCommentsWrapper(false);
         setTotalParentCommentsLoaded(0);
     };
 
@@ -54,7 +54,11 @@ const BlogPage = () => {
 
     const fetchBlog = () => {
         axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/get-blog", {blog_id})
-            .then(({data: {blog}}) => {
+            .then(async ({data: {blog}}) => {
+                blog.comments = await fetchComments({
+                    blog_id: blog._id,
+                    setParentCommentsCount: setTotalParentCommentsLoaded
+                })
                 setBlog(blog);
                 axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/search-blogs", {
                     tag: blog.tags[0],
@@ -86,7 +90,7 @@ const BlogPage = () => {
                         totalParentCommentsLoaded,
                         setTotalParentCommentsLoaded
                     }}>
-                        <CommentsContainer />
+                        <CommentsContainer/>
                         <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
                             <img src={banner} alt="blog banner" className="aspect-video"/>
                             <div className="mt-12">
