@@ -4,7 +4,7 @@ import {toast} from "react-hot-toast";
 import axios from "axios";
 import {BlogContext} from "../pages/blog.page.jsx";
 
-const CommentField = ({action}) => {
+const CommentField = ({action, index = undefined, replyingTo = undefined, setIsReplying}) => {
     const [comment, setComment] = useState('');
 
     const {userAuth: {accessToken, username, fullname, profile_img}} = useContext(UserContext);
@@ -30,7 +30,12 @@ const CommentField = ({action}) => {
             return toast.error("Empty comment can't be saved!");
         }
 
-        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/add-comment", {_id, blog_author, comment}, {
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/add-comment", {
+            _id,
+            blog_author,
+            comment,
+            replying_to: replyingTo
+        }, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
@@ -38,15 +43,26 @@ const CommentField = ({action}) => {
             .then(({data}) => {
                 setComment('');
                 data.commented_by = {personal_info: {username, profile_img, fullname}};
-                data.childrenLevel = 0;
-                let parentCommentIncrementValue = 1;
-                let newCommentArray;
+                let parentCommentIncrementValue = replyingTo ? 0 : 1;
+                let newCommentsArray;
 
-                newCommentArray = [data, ...commentsArray];
+                if (replyingTo) {
+                    commentsArray[index].children.push(data._id);
+                    data.childrenLevel = commentsArray[index].childrenLevel + 1;
+                    data.parentIndex = index;
+                    commentsArray[index].isReplyLoaded = true;
+                    commentsArray.splice(index + 1, 0, data);
+                    newCommentsArray = commentsArray;
+                    setIsReplying(false);
+                } else {
+                    data.childrenLevel = 0;
+                    newCommentsArray = [data, ...commentsArray];
+                }
+
 
                 setBlog({
                     ...blog,
-                    comments: {...comments, results: newCommentArray},
+                    comments: {...comments, results: newCommentsArray},
                     activity: {
                         ...activity,
                         total_comments: total_comments + 1,
