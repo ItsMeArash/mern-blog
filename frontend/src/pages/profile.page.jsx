@@ -89,7 +89,6 @@ const ProfilePage = () => {
                 });
 
                 formattedData.user_id = user_id;
-                console.log(formattedData)
                 setBlogs(formattedData);
             })
     }

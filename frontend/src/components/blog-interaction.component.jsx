@@ -50,8 +50,8 @@ const BlogInteraction = () => {
                     "Authorization": `Bearer ${accessToken}`
                 }
             })
-                .then(({data}) => {
-                    console.log(data)
+                .then(() => {
+                    // console.log(data)
                 })
                 .catch(err => {
                     console.log(err)

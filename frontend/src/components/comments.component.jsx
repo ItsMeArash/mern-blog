@@ -2,6 +2,9 @@ import {useContext} from "react";
 import {BlogContext} from "../pages/blog.page.jsx";
 import CommentField from "./comment-field.component.jsx";
 import axios from "axios";
+import NoDataMessage from "./nodata.component.jsx";
+import AnimationWrapper from "../common/page-animation.jsx";
+import CommentCard from "./comment-card.component.jsx";
 
 export const fetchComments = async ({skip = 0, blog_id, setParentCommentsCount, commentsArray = null}) => {
     let res;
@@ -24,7 +27,25 @@ export const fetchComments = async ({skip = 0, blog_id, setParentCommentsCount, 
 }
 
 const CommentsContainer = () => {
-    const {blog: {title}, commentsWrapper, setCommentsWrapper} = useContext(BlogContext);
+    const {
+        blog,
+        blog: {_id, title, comments: {results: commentsArray}, activity: {total_parent_comments}},
+        setBlog,
+        commentsWrapper,
+        setCommentsWrapper,
+        totalParentCommentsLoaded,
+        setTotalParentCommentsLoaded
+    } = useContext(BlogContext);
+
+    const loadMoreComments = async () => {
+        const newCommentsArray = await fetchComments({
+            skip: totalParentCommentsLoaded,
+            blog_id: _id,
+            setParentCommentsCount: setTotalParentCommentsLoaded,
+            commentsArray: commentsArray
+        });
+        setBlog({...blog, comments: newCommentsArray});
+    };
 
     return (
         <div
@@ -39,6 +60,25 @@ const CommentsContainer = () => {
             </div>
             <hr className="border-grey my-8 w-[120%] -ml-10"/>
             <CommentField action="comment"/>
+            {
+                commentsArray?.length ? commentsArray.map((comment, index) => {
+                    return (
+                        <AnimationWrapper key={index}>
+                            <CommentCard index={index}
+                                         leftValue={comment.childrenLevel * 4}
+                                         commentData={comment}/>
+                        </AnimationWrapper>
+                    );
+                }) : <NoDataMessage message="No comments in here :("/>
+            }
+            {
+                total_parent_comments > totalParentCommentsLoaded && (
+                    <button onClick={loadMoreComments}
+                            className="text-dark-grey p-2 px-3 hover:bg-grey/40 rounded-md flex items-center gap-2 active:bg-grey">
+                        Load More
+                    </button>
+                )
+            }
         </div>
     );
 };

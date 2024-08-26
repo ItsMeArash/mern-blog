@@ -10,7 +10,14 @@ const CommentField = ({action}) => {
     const {userAuth: {accessToken, username, fullname, profile_img}} = useContext(UserContext);
     const {
         blog,
-        blog: {_id, author: {_id: blog_author}, comments, activity, activity: {total_comments, total_parent_comments}},
+        blog: {
+            _id,
+            author: {_id: blog_author},
+            comments,
+            comments: {results: commentsArray},
+            activity,
+            activity: {total_comments, total_parent_comments}
+        },
         setBlog,
         setTotalParentCommentsLoaded
     } = useContext(BlogContext);
@@ -30,14 +37,13 @@ const CommentField = ({action}) => {
         })
             .then(({data}) => {
                 setComment('');
-                data.commentedBy = {personal_info: {username, profile_img, fullname}};
+                data.commented_by = {personal_info: {username, profile_img, fullname}};
+                data.childrenLevel = 0;
+                let parentCommentIncrementValue = 1;
                 let newCommentArray;
 
-                data.childrenLevel = 0;
+                newCommentArray = [data, ...commentsArray];
 
-                newCommentArray = [data];
-
-                let parentCommentIncrementValue = 1;
                 setBlog({
                     ...blog,
                     comments: {...comments, results: newCommentArray},
