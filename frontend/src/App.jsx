@@ -12,8 +12,15 @@ import ProfilePage from "./pages/profile.page.jsx";
 import AuthGuard from "./components/HOC/AuthGuard.jsx";
 import GuestGuard from "./components/HOC/GuestGuard.jsx";
 import BlogPage from "./pages/blog.page.jsx";
+import SideNav from "./components/sidenavbar.component.jsx";
 
 export const UserContext = createContext({});
+
+// otp
+// captcha
+// chat
+// pwa
+// i18n
 
 const App = () => {
     const [userAuth, setUserAuth] = useState({});
@@ -41,6 +48,10 @@ const App = () => {
                 <Route path="/editor/:blog_id" element={<AuthGuard><Editor/></AuthGuard>}/>
                 <Route path="/" element={<Navbar/>}>
                     <Route index element={<HomePage/>}/>
+                    <Route path="settings" element={<SideNav/>}>
+                        <Route path="edit-profile" element={<h2>edit profile page</h2>}/>
+                        <Route path="change-password" element={<h2>change password page</h2>}/>
+                    </Route>
                     <Route path="signin" element={<GuestGuard><UserAuthForm type='sign-in'/></GuestGuard>}/>
                     <Route path="signup" element={<GuestGuard><UserAuthForm type='sign-up'/></GuestGuard>}/>
                     <Route path="search/:query" element={<SearchPage/>}/>

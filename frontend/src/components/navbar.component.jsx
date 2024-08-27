@@ -43,7 +43,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="navbar flex justify-between w-full h-full">
+            <nav className="navbar flex justify-between w-full h-full z-50">
                 <div className="flex items-center gap-2">
                     <Link to="/" className="w-10 h-10">
                         <img src={logo} alt="logo"/>
