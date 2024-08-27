@@ -13,6 +13,8 @@ import AuthGuard from "./components/HOC/AuthGuard.jsx";
 import GuestGuard from "./components/HOC/GuestGuard.jsx";
 import BlogPage from "./pages/blog.page.jsx";
 import SideNav from "./components/sidenavbar.component.jsx";
+import ChangePassword from "./pages/change-password.page.jsx";
+import EditProfile from "./pages/edit-profile.page.jsx";
 
 export const UserContext = createContext({});
 
@@ -21,6 +23,7 @@ export const UserContext = createContext({});
 // chat
 // pwa
 // i18n
+// axios interception and globals
 
 const App = () => {
     const [userAuth, setUserAuth] = useState({});
@@ -49,8 +52,8 @@ const App = () => {
                 <Route path="/" element={<Navbar/>}>
                     <Route index element={<HomePage/>}/>
                     <Route path="settings" element={<SideNav/>}>
-                        <Route path="edit-profile" element={<h2>edit profile page</h2>}/>
-                        <Route path="change-password" element={<h2>change password page</h2>}/>
+                        <Route path="edit-profile" element={<EditProfile/>}/>
+                        <Route path="change-password" element={<ChangePassword/>}/>
                     </Route>
                     <Route path="signin" element={<GuestGuard><UserAuthForm type='sign-in'/></GuestGuard>}/>
                     <Route path="signup" element={<GuestGuard><UserAuthForm type='sign-up'/></GuestGuard>}/>

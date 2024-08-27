@@ -251,6 +251,44 @@ server.post("/google-auth", async (req, res) => {
         })
 })
 
+server.post("/change-password", verifyJWT, (req, res) => {
+    const {currentPassword, newPassword} = req.body;
+
+    if (!passwordRegex.test(currentPassword) || !passwordRegex.test(newPassword)) {
+        return res.status(403).json({error: "Password must be 6 up to 20 characters containing a numeric, a lowercase and a uppercase letter!"});
+    }
+
+    User.findOne({_id: req.user})
+        .then(user => {
+            if (user.google_auth) {
+                return res.status(403).json({error: "You can't account password because you have logged in using Google!"});
+            }
+
+            bcrypt.compare(currentPassword, user.personal_info.password, (error, result) => {
+                if (error) {
+                    return res.status(500).json({error: "Error occurred during changing your password! Please try again later"});
+                }
+                if (!result) {
+                    return res.status(403).json({error: "Incorrect current password!"});
+                }
+
+                bcrypt.hash(newPassword, 10, (error, hashedPassword) => {
+                    User.findOneAndUpdate({_id: req.user}, {"personal_info.password": hashedPassword})
+                        .then(() => {
+                            return res.status(200).json({status: "Password has been changed successfully"});
+                        })
+                        .catch(() => {
+                            return res.status(500).json({error: "Error occurred during changing your password! Please try again later"});
+                        })
+                })
+            })
+        })
+        .catch((err) => {
+            console.log(err);
+            return res.status(500).json({error: "Error occurred during changing your password! Please try again later"});
+        })
+})
+
 server.post("/latest-blogs", (req, res) => {
     const {page} = req.body;
     const maxLimit = 5;
@@ -618,7 +656,10 @@ const deleteComments = (_id) => {
                 .catch(err => {
                     console.log(err);
                 })
-            Blog.findOneAndUpdate({_id: comment.blog_id}, {$pull: {comments: _id}, $inc: {"activity.total_comments": -1, "activity.total_parent_comments": comment.parent ? 0 : -1}})
+            Blog.findOneAndUpdate({_id: comment.blog_id}, {
+                $pull: {comments: _id},
+                $inc: {"activity.total_comments": -1, "activity.total_parent_comments": comment.parent ? 0 : -1}
+            })
                 .then(blog => {
                     if (comment.children.length) {
                         comment.children.map(replies => {
