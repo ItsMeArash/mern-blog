@@ -37,6 +37,8 @@ const upload = multer({storage: storage});
 
 mongoose.connect(process.env.DB_LOCATION, {
     autoIndex: true,
+}).then(() => {
+    console.log("connected to DB");
 });
 
 const s3Client = new S3Client({
@@ -406,6 +408,63 @@ server.post("/get-profile", (req, res) => {
         .catch(err => {
             console.log(err);
             return res.status(500).json({error: err.message})
+        })
+})
+
+server.post("/update-profile-img", verifyJWT, (req, res) => {
+    const {url} = req.body;
+
+    User.findOneAndUpdate({_id: req.user}, {"personal_info.profile_img": url})
+        .then(() => {
+            return res.status(200).json({profile_img: url});
+        })
+        .catch(err => {
+            return res.status(500).json({error: err.message});
+        })
+})
+
+server.post("/update-profile", verifyJWT, (req, res) => {
+    const {username, bio, social_links} = req.body;
+    const bioLimit = 150;
+
+    if (username.length < 3) {
+        return res.status(403).json({error: "Username must have at least 3 characters"});
+    }
+    if (bio.length > bioLimit) {
+        return res.status(403).json({error: `Bio must be less than ${bioLimit} characters!`})
+    }
+
+    const socialLinksArray = Object.keys(social_links);
+    try {
+        for (let i = 0; i < socialLinksArray.length; i++) {
+            if (social_links[socialLinksArray[i]].length) {
+                const hostname = new URL(social_links[socialLinksArray[i]]).hostname;
+                if (!hostname.includes(`${socialLinksArray[i]}.com`) && socialLinksArray[i] !== "website") {
+                    return res.status(403).json({error: `${socialLinksArray[i]} link is invalid!`})
+                }
+            }
+        }
+    } catch (err) {
+        return res.status(500).json({error: "You must provide full social links with http(s) included"});
+    }
+
+    const updateFields = {
+        "personal_info.username": username,
+        "personal_info.bio": bio,
+        social_links
+    };
+
+    User.findOneAndUpdate({_id: req.user}, updateFields, {
+        runValidators: true
+    })
+        .then(() => {
+            return res.status(200).json({username});
+        })
+        .catch(err => {
+            if (err.code === 11000) {
+                return res.status(409).json({error: "Username is already taken!"});
+            }
+            return res.status(500).json({error: err.message});
         })
 })
 

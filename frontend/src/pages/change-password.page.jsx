@@ -1,12 +1,11 @@
 import AnimationWrapper from "../common/page-animation.jsx";
 import InputBox from "../components/input.component.jsx";
-import {useContext, useRef} from "react";
+import {useContext} from "react";
 import {toast} from "react-hot-toast";
 import axios from "axios";
 import {UserContext} from "../App.jsx";
 
 const ChangePassword = () => {
-    const changePasswordForm = useRef();
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
     const {userAuth: {accessToken}} = useContext(UserContext);
@@ -14,7 +13,7 @@ const ChangePassword = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        const form = new FormData(changePasswordForm.current);
+        const form = new FormData(event.target);
         const formData = {};
         for (let [key, value] of form.entries()) {
             formData[key] = value;
@@ -51,7 +50,7 @@ const ChangePassword = () => {
 
     return (
         <AnimationWrapper>
-            <form ref={changePasswordForm}>
+            <form onSubmit={handleSubmit}>
                 <h1 className="max-md:hidden ">Change Password</h1>
                 <div className="py-10 w-full md:max-w-[400px]">
                     <InputBox name="currentPassword"
@@ -65,8 +64,7 @@ const ChangePassword = () => {
                               placeholder="New Password"
                               icon="fi-rr-unlock"/>
                     <button className="btn-dark px-10"
-                            type="submit"
-                            onClick={handleSubmit}>
+                            type="submit">
                         Change Password
                     </button>
                 </div>
