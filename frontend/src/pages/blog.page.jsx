@@ -99,7 +99,7 @@ const BlogPage = () => {
                                     <div className="flex gap-5 items-start">
                                         <img src={profile_img} alt="user avatar" className="h-12 w-12 rounded-full"/>
 
-                                        <p>
+                                        <p className="capitalize">
                                             {fullname}
                                             <br/>
                                             @
