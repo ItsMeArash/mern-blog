@@ -596,7 +596,7 @@ server.post("/isliked-by-user", verifyJWT, (req, res) => {
 
 server.post("/add-comment", verifyJWT, (req, res) => {
     const user_id = req.user;
-    const {_id, comment, blog_author, replying_to} = req.body;
+    const {_id, comment, blog_author, replying_to, notification_id} = req.body;
 
     if (!comment.length) {
         return res.status(403).json({error: "Write something to submit your comment!"});
@@ -636,6 +636,16 @@ server.post("/add-comment", verifyJWT, (req, res) => {
             notificationObject.replied_on_comment = replying_to;
             await Comment.findOneAndUpdate({_id: replying_to}, {$push: {children: commentFile._id}})
                 .then(replyingToCommentDoc => notificationObject.notification_for = replyingToCommentDoc.commented_by);
+
+            if (notification_id) {
+                Notification.findOneAndUpdate({_id: notification_id}, {reply: commentFile._id})
+                    .then(() => {
+                        console.log('Notification updated');
+                    })
+                    .catch(() => {
+                        console.log("Failed to update notification!");
+                    })
+            }
         }
 
         new Notification(notificationObject).save().then(notification => console.log("New notification created!"));

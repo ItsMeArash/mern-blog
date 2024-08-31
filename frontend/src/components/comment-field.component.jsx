@@ -75,7 +75,6 @@ const CommentField = ({action, index = undefined, replyingTo = undefined, setIsR
             .catch(err => {
                 console.log(err);
             })
-
     };
 
     return (

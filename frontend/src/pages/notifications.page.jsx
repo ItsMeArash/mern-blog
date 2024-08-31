@@ -71,7 +71,9 @@ const Notifications = () => {
                                 notifications.results.map((notification, index) => {
                                     return (
                                         <AnimationWrapper key={index} transition={{delay: index * 0.08}}>
-                                            <NotificationCard/>
+                                            <NotificationCard data={notification}
+                                                              index={index}
+                                                              notificationState={{notifications, setNotifications}}/>
                                         </AnimationWrapper>
                                     )
                                 }) :
@@ -82,7 +84,7 @@ const Notifications = () => {
             }
             <LoadMoreDataBtn state={notifications}
                              fetchData={fetchNotifications}
-                             additionalParams={{deletedDocCount: notifications.deletedDocCount}}/>
+                             additionalParams={{deletedDocCount: notifications?.deletedDocCount}}/>
         </div>
     );
 };
