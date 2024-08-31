@@ -165,7 +165,7 @@ const BlogEditor = () => {
                                   onChange={handleTitleChange}>
                         </textarea>
                         <hr className="w-full opacity-10 my-5"/>
-                        <div id="textEditor" className="font-gelasio">
+                        <div id="textEditor">
                         </div>
                     </div>
                 </section>

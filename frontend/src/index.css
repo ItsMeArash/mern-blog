@@ -113,7 +113,7 @@
     }
 
     #textEditor *, .blog-page-content *{
-        @apply font-gelasio text-xl leading-10 md:text-2xl;
+        @apply text-xl leading-10 md:text-2xl;
     }
 
     #textEditor a, .blog-page-content a{
@@ -154,8 +154,4 @@
 
 .fa {
     font-family: 'Yekan';
-}
-
-.en h1 {
-    font-family: 'gelasio';
 }

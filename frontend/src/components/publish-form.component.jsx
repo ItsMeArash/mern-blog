@@ -109,7 +109,7 @@ const PublishForm = () => {
                         {title}
                     </h1>
 
-                    <p className="font-gelasio line-clamp-2 text-xl leading-7 mt-4">{des}</p>
+                    <p className="line-clamp-2 text-xl leading-7 mt-4">{des}</p>
                 </div>
 
                 <div className="border-grey lg:border-1 lg:pl-8">
