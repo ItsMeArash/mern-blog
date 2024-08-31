@@ -3,7 +3,7 @@ import {Navigate, NavLink, Outlet} from "react-router-dom";
 import {UserContext} from "../App.jsx";
 
 const SideNav = () => {
-    const {userAuth: {accessToken}} = useContext(UserContext);
+    const {userAuth: {accessToken, new_notification_available}} = useContext(UserContext);
     const page = location.pathname.split("/")[2];
 
     const [pageState, setPageState] = useState(page.replace('-', ' '));
@@ -62,7 +62,15 @@ const SideNav = () => {
                             <NavLink to="/dashboard/notifications"
                                      onClick={event => setPageState(event.target.innerText)}
                                      className="sidebar-link">
-                                <i className="fi fi-rr-bell"></i>
+                                <div className="relative">
+                                    <i className="fi fi-rr-bell"></i>
+                                    {
+                                        new_notification_available && (
+                                            <span
+                                                className="bg-red w-2 h-2 rounded-full absolute z-10 top-0 right-0"></span>
+                                        )
+                                    }
+                                </div>
                                 Notifications
                             </NavLink>
                             <NavLink to="/editor"
