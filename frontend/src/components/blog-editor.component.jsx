@@ -153,7 +153,7 @@ const BlogEditor = () => {
                         <div
                             className="related aspect-video bg-white border-4 border-grey hover:opacity-80 cursor-pointer">
                             <label htmlFor="uploadBanner">
-                                <img src={banner || defaultBanner} alt="blog banner" className="z-20"/>
+                                <img src={banner || defaultBanner} alt="blog banner" className="z-20 overflow-hidden"/>
                                 <input id="uploadBanner" type="file" accept=".png, .jpg, .jpeg" hidden
                                        onChange={handleBannerUpload}/>
                             </label>

@@ -157,7 +157,8 @@ const EditProfile = () => {
                                     <i className="fi fi-rr-upload text-2xl"></i>
                                     Upload Image
                                 </div>
-                                <img ref={profileImage} src={profile_img} alt="user avatar"/>
+                                <img ref={profileImage} src={profile_img} alt="user avatar"
+                                     className="overflow-hidden"/>
                             </label>
                             <input type="file"
                                    id="uploadImg"

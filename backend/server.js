@@ -718,7 +718,7 @@ const deleteComments = (_id) => {
                 .catch(err => {
                     console.log(err);
                 });
-            Notification.findOneAndDelete({reply: _id})
+            Notification.findOneAndUpdate({reply: _id}, {$unset: {reply: 1}})
                 .then(() => {
                     console.log("Reply notification has been deleted!");
                 })
@@ -795,6 +795,12 @@ server.post("/notifications", verifyJWT, (req, res) => {
         .sort({createdAt: -1})
         .select("createdAt type seen reply")
         .then(notifications => {
+            Notification.updateMany(findQuery, {seen: true})
+                .skip(skipDocs)
+                .limit(maxLimit)
+                .then(() => {
+                    console.log("Notification seen");
+                })
             return res.status(200).json({notifications});
         })
         .catch(err => {

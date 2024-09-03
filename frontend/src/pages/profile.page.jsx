@@ -102,7 +102,7 @@ const ProfilePage = () => {
                             <div
                                 className="flex flex-col max-md:items-center gap-5 min-w-[250px] md:w-[50%] md:pl-8 md:border-l border-grey md:sticky md:top-[100px] md:py-10">
                                 <img src={profile_img} alt="User avatar"
-                                     className="w-48 h-48 bg-grey rounded-full md:w-32 md:h-32"/>
+                                     className="w-48 h-48 bg-grey rounded-full md:w-32 md:h-32 overflow-hidden"/>
                                 <h1 className="text-2xl font-medium">{profile_username}</h1>
                                 <p className="text-xl capitalize h-6">{fullname}</p>
                                 <p className="">{total_posts.toLocaleString()} Blogs

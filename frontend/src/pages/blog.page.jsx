@@ -97,7 +97,8 @@ const BlogPage = () => {
                                 <h2>{title}</h2>
                                 <div className="flex max-sm:flex-col justify-between my-8">
                                     <div className="flex gap-5 items-start">
-                                        <img src={profile_img} alt="user avatar" className="h-12 w-12 rounded-full"/>
+                                        <img src={profile_img} alt="user avatar"
+                                             className="h-12 w-12 overflow-hidden rounded-full"/>
 
                                         <p className="capitalize">
                                             {fullname}

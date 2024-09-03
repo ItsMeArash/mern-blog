@@ -9,7 +9,7 @@ const BlogPostCard = ({content, author}) => {
         <Link to={`/blog/${id}`} className="flex gap-8 items-center border-b border-grey pb-5 mb-4">
             <div className="w-full">
                 <div className="flex gap-2 items-center mb-7">
-                    <img src={profile_img} alt="author avatar" className="w-6 h-6 rounded-full"/>
+                    <img src={profile_img} alt="author avatar" className="w-6 h-6 rounded-full overflow-hidden"/>
                     <p className="line-clamp-1 capitalize">
                         {fullname} @{username}
                     </p>
@@ -29,7 +29,8 @@ const BlogPostCard = ({content, author}) => {
                 </div>
             </div>
             <div className="h-28 aspect-square bg-grey">
-                <img src={banner} alt="blog banner" className="w-full h-full aspect-square object-cover"/>
+                <img src={banner} alt="blog banner"
+                     className="w-full overflow-hidden h-full aspect-square object-cover"/>
             </div>
         </Link>
     )

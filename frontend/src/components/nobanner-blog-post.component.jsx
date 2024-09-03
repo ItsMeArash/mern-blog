@@ -13,7 +13,7 @@ const MinimalBlogPost = ({blog, index}) => {
             </h1>
             <div>
                 <div className="flex gap-2 items-center mb-7">
-                    <img src={profile_img} alt="author avatar" className="w-6 h-6 rounded-full"/>
+                    <img src={profile_img} alt="author avatar" className="w-6 h-6 rounded-full overflow-hidden"/>
                     <p className="line-clamp-1 capitalize">
                         {fullname} @{username}
                     </p>

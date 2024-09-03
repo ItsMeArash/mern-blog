@@ -102,7 +102,7 @@ const PublishForm = () => {
                     <p className="text-dark-grey mb-1">Preview</p>
 
                     <div className="w-full aspect-video rounded-lg overflow-hidden bg-grey mt-4">
-                        <img src={banner} alt="blog banner"/>
+                        <img src={banner} alt="blog banner" className="overflow-hidden"/>
                     </div>
 
                     <h1 className="text-4xl font-medium mt-2 leading-tight line-clamp-1 ">

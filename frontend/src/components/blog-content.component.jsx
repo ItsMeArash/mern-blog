@@ -1,7 +1,7 @@
 const Img = ({url, caption}) => {
     return (
         <div>
-            <img src={url} alt="image"/>
+            <img src={url} alt="image" className="overflow-hidden"/>
             {caption?.length && <p className="w-full text-center my-3 md:mb-12 text-base text-dark-grey"
                                    dangerouslySetInnerHTML={{__html: caption}}></p>
             }

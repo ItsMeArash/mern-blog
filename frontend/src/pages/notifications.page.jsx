@@ -14,7 +14,7 @@ const Notifications = () => {
 
     const filters = ["all", "like", "comment", "reply"];
 
-    const {userAuth: {accessToken}} = useContext(UserContext);
+    const {userAuth, userAuth: {accessToken, new_notification_available}, setUserAuth} = useContext(UserContext);
 
     useEffect(() => {
         if (accessToken) {
@@ -26,6 +26,10 @@ const Notifications = () => {
         axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/notifications", {page, filter, deletedDocCount},
             {headers: {Authorization: `Bearer ${accessToken}`}})
             .then(async ({data: {notifications: data}}) => {
+                if (new_notification_available) {
+                    setUserAuth({...userAuth, new_notification_available: false})
+                }
+
                 const formattedData = await filterPaginationData({
                     state: notifications,
                     data,

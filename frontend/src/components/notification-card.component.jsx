@@ -1,13 +1,17 @@
 import {Link} from "react-router-dom";
 import {getDay} from "../common/date.jsx";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import NotificationCommentField from "./notification-comment-field.component.jsx";
+import {UserContext} from "../App.jsx";
+import axios from "axios";
 
 const NotificationCard = ({data, index, notificationState}) => {
     const [isReplying, setIsReplying] = useState(false)
 
     const {
+        seen,
         type,
+        reply,
         comment,
         replied_on_comment,
         createdAt,
@@ -17,16 +21,53 @@ const NotificationCard = ({data, index, notificationState}) => {
         _id: notification_id
     } = data;
 
+    const {
+        userAuth: {
+            username: author_username,
+            profile_img: author_profile_img,
+            accessToken
+        }
+    } = useContext(UserContext);
+
+    const {notifications, notifications: {results, totalDocs}, setNotifications} = notificationState;
+
     const handleReplyClick = () => {
         setIsReplying(prev => !prev);
     };
 
+    const handleDeleteClick = (comment_id, type, target) => {
+        target.setAttribute("disabled", true);
+
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/delete-comment", {_id: comment._id}, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        })
+            .then(() => {
+                if (type === "comment") {
+                    results.splice(index, 1);
+                } else {
+                    delete results[index].reply;
+                }
+                target.removeAttribute("disabled");
+                setNotifications({
+                    ...notifications,
+                    results,
+                    totalDocs: totalDocs - 1,
+                    deleteDocCount: notifications.deleteDocCount + 1
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    };
+
     return (
-        <div className="p-6 border-b border-grey border-l-black">
+        <div className={`p-6 border-b border-grey border-l-black ${!seen ? "border-l-2" : ""}`}>
             <div className="flex gap-5 mb-3">
                 <img src={profile_img}
                      alt="user avatar"
-                     className="w-14 h-14 flex-none rounded-full"/>
+                     className="w-14 h-14 flex-none rounded-full overflow-hidden"/>
                 <div className="w-full">
                     <h1 className="font-medium text-xl text-dark-grey">
                         <span className="lg:inline-block hidden capitalize">{fullname}</span>
@@ -64,11 +105,16 @@ const NotificationCard = ({data, index, notificationState}) => {
                 {
                     type !== "like" && (
                         <>
+                            {
+                                !reply && (
+                                    <button className="underline hover:text-black"
+                                            onClick={handleReplyClick}>
+                                        Reply
+                                    </button>
+                                )
+                            }
                             <button className="underline hover:text-black"
-                                    onClick={handleReplyClick}>
-                                Reply
-                            </button>
-                            <button className="underline hover:text-black">
+                                    onClick={event => handleDeleteClick(comment._id, "comment", event.target)}>
                                 Delete
                             </button>
                         </>
@@ -85,6 +131,31 @@ const NotificationCard = ({data, index, notificationState}) => {
                                                   setIsReplying={setIsReplying}
                                                   notification_id={notification_id}
                                                   notificationData={notificationState}/>
+                    </div>
+                )
+            }
+            {
+                reply && (
+                    <div className="ml-20 p-5 bg-grey mt-5 rounded-md">
+                        <div className="flex gap-3 mb-3">
+                            <img src={author_profile_img}
+                                 alt="author avatar"
+                                 className="w-8 h-8 rounded-full bg-white overflow-hidden"/>
+                            <div>
+                                <h1 className="font-medium text-xl text-dark-grey">
+                                    <Link to={`/user/${author_username}`}
+                                          className="mx-1 text-black underline underline-offset-3">@{author_username}</Link>
+                                    <span className="font-normal">replied to</span>
+                                    <Link to={`/user/${username}`}
+                                          className="mx-1 text-black underline underline-offset-3">@{username}</Link>
+                                </h1>
+                            </div>
+                        </div>
+                        <p className="ml-14 text-xl my-2">{reply.comment}</p>
+                        <button className="underline hover:text-black ml-14 mt-2"
+                                onClick={event => handleDeleteClick(comment._id, "reply", event.target)}>
+                            Delete
+                        </button>
                     </div>
                 )
             }
