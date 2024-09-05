@@ -16,6 +16,7 @@ import SideNav from "./components/sidenavbar.component.jsx";
 import ChangePassword from "./pages/change-password.page.jsx";
 import EditProfile from "./pages/edit-profile.page.jsx";
 import Notifications from "./pages/notifications.page.jsx";
+import ManageBlogs from "./pages/manage-blogs.page.jsx";
 
 export const UserContext = createContext({});
 
@@ -25,6 +26,7 @@ export const UserContext = createContext({});
 // pwa
 // i18n
 // axios interception and globals
+// s3
 
 const App = () => {
     const [userAuth, setUserAuth] = useState({});
@@ -57,6 +59,7 @@ const App = () => {
                         <Route path="change-password" element={<ChangePassword/>}/>
                     </Route>
                     <Route path="dashboard" element={<SideNav/>}>
+                        <Route path="blogs" element={<ManageBlogs/>}/>
                         <Route path="notifications" element={<Notifications/>}/>
                     </Route>
                     <Route path="signin" element={<GuestGuard><UserAuthForm type='sign-in'/></GuestGuard>}/>
