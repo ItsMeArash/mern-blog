@@ -26,7 +26,7 @@ admin.initializeApp({
     // credential: admin.credential.cert({})
 })
 
-let emailRegex = /^\w+([\.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+let emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
 
 server.use(express.json());
@@ -50,17 +50,17 @@ const s3Client = new S3Client({
     },
 })
 
-const generateUploadUrl = async () => {
-    const date = new Date();
-    const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
-
-    return await s3.getSignedUrlPromise("putObject", {
-        Bucket: "itsmearash",
-        Key: imageName,
-        Expires: 1000,
-        ContentType: "image/jpeg"
-    })
-}
+// const generateUploadUrl = async () => {
+//     const date = new Date();
+//     const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
+//
+//     return await s3.getSignedUrlPromise("putObject", {
+//         Bucket: "itsmearash",
+//         Key: imageName,
+//         Expires: 1000,
+//         ContentType: "image/jpeg"
+//     })
+// }
 
 const formatDataToSend = (user) => {
     const accessToken = jwt.sign({id: user._id}, process.env.SECRET_ACCESS_KEY);
@@ -123,14 +123,14 @@ server.post('/upload-image', upload.single('image'), async (req, res) => {
         try {
             const data = await s3Client.send(new PutObjectCommand(params));
             console.log(data);
-            const urlparams = {
+            const urlParams = {
                 Bucket: process.env.LIARA_BUCKET_NAME,
                 Key: uniqueKey,
             };
 
-            const command = new GetObjectCommand(urlparams);
+            const command = new GetObjectCommand(urlParams);
             getSignedUrl(s3Client, command).then((url) => {
-                return res.status(200).json({file: 'okkk', url: url});
+                return res.status(200).json({file: 'ok', url: url});
             });
         } catch (error) {
             console.error(error);
@@ -167,7 +167,7 @@ server.post("/signup", (req, res) => {
         let user = new User({
             personal_info: {fullname, email, password: hashed_password, username}
         });
-        user.save().then((u) => {
+        user?.save().then((u) => {
 
             return res.status(200).json(formatDataToSend(u));
         }).catch(err => {
@@ -501,7 +501,7 @@ server.post("/create-blog", verifyJWT, (req, res) => {
             .then(() => {
                 return res.status(200).json({id: blog_id});
             })
-            .catch(err => {
+            .catch(() => {
                 return res.status(500).json({error: "Failed to update total posts number!"});
             })
     } else {
@@ -514,9 +514,9 @@ server.post("/create-blog", verifyJWT, (req, res) => {
             User.findOneAndUpdate({_id: authorID}, {
                 $inc: {"account_info.total_posts": incrementValue},
                 $push: {"blogs": blog._id}
-            }).then(user => {
+            }).then(() => {
                 return res.status(200).json({id: blog.blog_id})
-            }).catch(err => {
+            }).catch(() => {
                 return res.status(500).json({"error": "Failed to update total post number!"});
             })
         }).catch(err => {
@@ -571,7 +571,7 @@ server.post("/like-blog", verifyJWT, (req, res) => {
                     })
             } else {
                 Notification.findOneAndDelete({user: user_id, blog: _id, type: "like"})
-                    .then(data => {
+                    .then(() => {
                         return res.status(200).json({liked_by_user: false});
                     })
                     .catch(err => {
@@ -581,7 +581,7 @@ server.post("/like-blog", verifyJWT, (req, res) => {
         })
 })
 
-server.post("/isliked-by-user", verifyJWT, (req, res) => {
+server.post("/isLiked-by-user", verifyJWT, (req, res) => {
     const user_id = req.user;
     const {_id} = req.body;
 
@@ -614,13 +614,13 @@ server.post("/add-comment", verifyJWT, (req, res) => {
         commentObject.isReply = true;
     }
 
-    new Comment(commentObject).save().then(async commentFile => {
+    new Comment(commentObject)?.save().then(async commentFile => {
         const {comment, commentedAt, children} = commentFile;
 
         Blog.findOneAndUpdate({_id}, {
             $push: {"comments": commentFile._id},
             $inc: {"activity.total_comments": 1, "activity.total_parent_comments": replying_to ? 0 : 1}
-        }).then(blog => {
+        }).then(() => {
             console.log('new comment added')
         })
 
@@ -648,7 +648,7 @@ server.post("/add-comment", verifyJWT, (req, res) => {
             }
         }
 
-        new Notification(notificationObject).save().then(notification => console.log("New notification created!"));
+        new Notification(notificationObject)?.save().then(() => console.log("New notification created!"));
 
         return res.status(200).json({comment, commentedAt, _id: commentFile._id, user_id, children});
     })
@@ -729,7 +729,7 @@ const deleteComments = (_id) => {
                 $pull: {comments: _id},
                 $inc: {"activity.total_comments": -1, "activity.total_parent_comments": comment.parent ? 0 : -1}
             })
-                .then(blog => {
+                .then(() => {
                     if (comment.children.length) {
                         comment.children.map(replies => {
                             deleteComments(replies);
@@ -746,6 +746,7 @@ server.post("/delete-comment", verifyJWT, (req, res) => {
     const {_id} = req.body;
     Comment.findOne({_id})
         .then(comment => {
+            // noinspection EqualityComparisonWithCoercionJS
             if (user_id == comment.commented_by || user_id == comment.blog_author) {
                 deleteComments(_id);
 

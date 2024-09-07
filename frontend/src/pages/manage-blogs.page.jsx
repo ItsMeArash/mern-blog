@@ -52,8 +52,9 @@ const ManageBlogs = () => {
         const searchQuery = event.target.value;
         setQuery(searchQuery);
 
-        if (event.keyCode === 13) {
+        if (event.keyCode === 13 && searchQuery.length) {
             //     handle submit
+
         }
     };
 

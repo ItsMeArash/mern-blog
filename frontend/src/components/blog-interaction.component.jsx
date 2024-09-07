@@ -25,7 +25,7 @@ const BlogInteraction = () => {
 
     useEffect(() => {
         if (accessToken) {
-            axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/isliked-by-user", {_id}, {
+            axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/isLiked-by-user", {_id}, {
                 headers: {
                     "Authorization": `Bearer ${accessToken}`
                 }
