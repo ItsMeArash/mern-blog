@@ -27,6 +27,7 @@ export const UserContext = createContext({});
 // i18n
 // axios interception and globals
 // s3
+// sentry
 
 const App = () => {
     const [userAuth, setUserAuth] = useState({});

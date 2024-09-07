@@ -2,6 +2,11 @@ import {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import {UserContext} from "../App.jsx";
 import {filterPaginationData} from "../common/filter-pagination-data.jsx";
+import InPageNavigation from "../components/inpage-navigation.component.jsx";
+import Loader from "../components/loader.component.jsx";
+import NoDataMessage from "../components/nodata.component.jsx";
+import AnimationWrapper from "../common/page-animation.jsx";
+import ManagePublishedBlogCard from "../components/manage-blogcard.component.jsx";
 
 const ManageBlogs = () => {
     const [blogs, setBlogs] = useState(null);
@@ -13,10 +18,10 @@ const ManageBlogs = () => {
     useEffect(() => {
         if (accessToken) {
             if (blogs === null) {
-                getBlogs({page: 1, draft: false})
+                getBlogs({page: 1, draft: false});
             }
             if (drafts === null) {
-                getBlogs({page: 1, draft: true})
+                getBlogs({page: 1, draft: true});
             }
         }
     }, [accessToken, blogs, drafts, query]);
@@ -35,17 +40,21 @@ const ManageBlogs = () => {
                     user: accessToken,
                     countRoute: "/user-written-blogs-count",
                     data_to_send: {draft, query}
-                })
+                });
 
                 draft ? setDrafts(formattedData) : setBlogs(formattedData);
             })
             .catch(err => {
                 console.log(err);
-            })
-    }
+            });
+    };
 
     const handleChange = (event) => {
-
+        if (!event.target.value.length) {
+            setQuery('');
+            setBlogs(null);
+            setDrafts(null);
+        }
     };
 
     const handleSearch = (event) => {
@@ -53,8 +62,8 @@ const ManageBlogs = () => {
         setQuery(searchQuery);
 
         if (event.keyCode === 13 && searchQuery.length) {
-            //     handle submit
-
+            setBlogs(null);
+            setDrafts(null);
         }
     };
 
@@ -69,6 +78,28 @@ const ManageBlogs = () => {
                        onKeyDown={handleSearch}/>
                 <i className="fi fi-rr-search absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-xl text-dark-grey"></i>
             </div>
+
+            <InPageNavigation routes={["Published Blogs", "Drafts"]}>
+                {
+                    blogs === null ? <Loader/> : (
+                        !!blogs.results.length ? (
+                            <>
+                                {
+                                    blogs.results.map((blog, index) => (
+                                        <AnimationWrapper key={index}
+                                                          transition={{delay: index * 0.04}}>
+                                            <ManagePublishedBlogCard blog={blog}/>
+                                        </AnimationWrapper>
+                                    ))
+                                }
+                            </>
+                        ) : (
+                            <NoDataMessage message="No published blogs"/>
+                        )
+                    )
+                }
+                <h1>This is draft blogs</h1>
+            </InPageNavigation>
         </>
     );
 };
