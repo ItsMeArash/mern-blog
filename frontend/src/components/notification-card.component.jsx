@@ -38,7 +38,7 @@ const NotificationCard = ({data, index, notificationState}) => {
     const handleDeleteClick = (comment_id, type, target) => {
         target.setAttribute("disabled", true);
 
-        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/delete-comment", {_id: comment._id}, {
+        axios.post(import.meta.env.VITE_SERVER_DOMAIN + "/delete-comment", {_id: comment_id}, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
@@ -153,7 +153,7 @@ const NotificationCard = ({data, index, notificationState}) => {
                         </div>
                         <p className="ml-14 text-xl my-2">{reply.comment}</p>
                         <button className="underline hover:text-black ml-14 mt-2"
-                                onClick={event => handleDeleteClick(comment._id, "reply", event.target)}>
+                                onClick={event => handleDeleteClick(reply._id, "reply", event.target)}>
                             Delete
                         </button>
                     </div>
