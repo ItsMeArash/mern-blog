@@ -1,7 +1,7 @@
 import {Link, useNavigate, useParams} from "react-router-dom";
 import AnimationWrapper from "../common/page-animation.jsx";
 import logo from "../imgs/logo.png";
-import defaultBanner from "../imgs/blog banner.png"
+import defaultBanner from "../imgs/blog banner.png";
 import {uploadImage} from "../common/aws.jsx";
 import {useContext, useEffect} from "react";
 import {toast} from "react-hot-toast";
@@ -121,7 +121,7 @@ const BlogEditor = () => {
                     toast.success("Saved as draft!");
 
                     setTimeout(() => {
-                        navigate('/');
+                        navigate('/dashboard/blogs?tab=draft');
                     }, 500)
                 }).catch(({response}) => {
                     event.target.classList.remove("disable");
