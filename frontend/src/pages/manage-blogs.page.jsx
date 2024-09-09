@@ -6,7 +6,7 @@ import InPageNavigation from "../components/inpage-navigation.component.jsx";
 import Loader from "../components/loader.component.jsx";
 import NoDataMessage from "../components/nodata.component.jsx";
 import AnimationWrapper from "../common/page-animation.jsx";
-import ManagePublishedBlogCard from "../components/manage-blogcard.component.jsx";
+import {ManageDraftBlogPost, ManagePublishedBlogCard} from "../components/manage-blogcard.component.jsx";
 
 const ManageBlogs = () => {
     const [blogs, setBlogs] = useState(null);
@@ -88,7 +88,8 @@ const ManageBlogs = () => {
                                     blogs.results.map((blog, index) => (
                                         <AnimationWrapper key={index}
                                                           transition={{delay: index * 0.04}}>
-                                            <ManagePublishedBlogCard blog={blog}/>
+                                            <ManagePublishedBlogCard
+                                                blog={{...blog, index, setStateFunction: setBlogs}}/>
                                         </AnimationWrapper>
                                     ))
                                 }
@@ -98,7 +99,25 @@ const ManageBlogs = () => {
                         )
                     )
                 }
-                <h1>This is draft blogs</h1>
+                {
+                    drafts === null ? <Loader/> : (
+                        !!drafts.results.length ? (
+                            <>
+                                {
+                                    drafts.results.map((blog, index) => (
+                                        <AnimationWrapper key={index}
+                                                          transition={{delay: index * 0.04}}>
+                                            <ManageDraftBlogPost
+                                                blog={{...blog, index, setStateFunction: setDrafts}}/>
+                                        </AnimationWrapper>
+                                    ))
+                                }
+                            </>
+                        ) : (
+                            <NoDataMessage message="No draft blogs"/>
+                        )
+                    )
+                }
             </InPageNavigation>
         </>
     );
