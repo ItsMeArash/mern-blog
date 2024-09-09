@@ -19,6 +19,9 @@ import Notifications from "./pages/notifications.page.jsx";
 import ManageBlogs from "./pages/manage-blogs.page.jsx";
 
 export const UserContext = createContext({});
+export const ThemeContext = createContext({});
+
+const darkThemePreference = () => window.matchMedia("(prefers-dark-scheme: dark)").matches;
 
 // otp
 // captcha
@@ -32,8 +35,10 @@ export const UserContext = createContext({});
 
 const App = () => {
     const [userAuth, setUserAuth] = useState({});
+    const [theme, setTheme] = useState(() => darkThemePreference() ? "dark" : "light");
 
     useEffect(() => {
+        // doing language direction stuff
         const userSelectedLanguage = localStorage.getItem("i18nextLng");
         if (userSelectedLanguage) {
             if (userSelectedLanguage === "fa") {
@@ -45,36 +50,51 @@ const App = () => {
             }
         }
 
+        // getting access token from local storage
         const userInSession = lookInSession("user");
-        userInSession ? setUserAuth(JSON.parse(userInSession)) : setUserAuth({accessToken: null})
+        userInSession ? setUserAuth(JSON.parse(userInSession)) : setUserAuth({accessToken: null});
+
+        // doing dark mode stuff
+        const themeInSession = lookInSession("theme");
+        if (themeInSession) {
+            setTheme(() => {
+                document.body.setAttribute("data-theme", themeInSession);
+                return themeInSession;
+
+            });
+        } else {
+            document.body.setAttribute("data-theme", theme);
+        }
     }, []);
 
     return (
-        <UserContext.Provider value={{userAuth, setUserAuth}}>
-            <Routes>
-                <Route path="/editor" element={<AuthGuard><Editor/></AuthGuard>}/>
-                <Route path="/editor/:blog_id" element={<AuthGuard><Editor/></AuthGuard>}/>
-                <Route path="/" element={<Navbar/>}>
-                    <Route index element={<HomePage/>}/>
-                    <Route path="settings" element={<SideNav/>}>
-                        <Route path="edit-profile" element={<EditProfile/>}/>
-                        <Route path="change-password" element={<ChangePassword/>}/>
+        <ThemeContext.Provider value={{theme, setTheme}}>
+            <UserContext.Provider value={{userAuth, setUserAuth}}>
+                <Routes>
+                    <Route path="/editor" element={<AuthGuard><Editor/></AuthGuard>}/>
+                    <Route path="/editor/:blog_id" element={<AuthGuard><Editor/></AuthGuard>}/>
+                    <Route path="/" element={<Navbar/>}>
+                        <Route index element={<HomePage/>}/>
+                        <Route path="settings" element={<SideNav/>}>
+                            <Route path="edit-profile" element={<EditProfile/>}/>
+                            <Route path="change-password" element={<ChangePassword/>}/>
+                        </Route>
+                        <Route path="dashboard" element={<SideNav/>}>
+                            <Route path="blogs" element={<ManageBlogs/>}/>
+                            <Route path="notifications" element={<Notifications/>}/>
+                        </Route>
+                        <Route path="signin" element={<GuestGuard><UserAuthForm type="sign-in"/></GuestGuard>}/>
+                        <Route path="signup" element={<GuestGuard><UserAuthForm type="sign-up"/></GuestGuard>}/>
+                        <Route path="search/:query" element={<SearchPage/>}/>
+                        <Route path="user/:id" element={<ProfilePage/>}/>
+                        <Route path="blog/:blog_id" element={<BlogPage/>}/>
+                        <Route path="*" element={<PageNotFound/>}/>
                     </Route>
-                    <Route path="dashboard" element={<SideNav/>}>
-                        <Route path="blogs" element={<ManageBlogs/>}/>
-                        <Route path="notifications" element={<Notifications/>}/>
-                    </Route>
-                    <Route path="signin" element={<GuestGuard><UserAuthForm type='sign-in'/></GuestGuard>}/>
-                    <Route path="signup" element={<GuestGuard><UserAuthForm type='sign-up'/></GuestGuard>}/>
-                    <Route path="search/:query" element={<SearchPage/>}/>
-                    <Route path="user/:id" element={<ProfilePage/>}/>
-                    <Route path="blog/:blog_id" element={<BlogPage/>}/>
-                    <Route path="*" element={<PageNotFound/>}/>
-                </Route>
-            </Routes>
-            <Toaster/>
-        </UserContext.Provider>
-    )
-}
+                </Routes>
+                <Toaster/>
+            </UserContext.Provider>
+        </ThemeContext.Provider>
+    );
+};
 
 export default App;

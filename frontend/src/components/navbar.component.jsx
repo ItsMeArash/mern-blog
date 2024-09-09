@@ -1,17 +1,21 @@
-import logo from "../imgs/logo.png";
 import {Link, Outlet, useNavigate} from "react-router-dom";
 import {useContext, useEffect, useRef, useState} from "react";
 import LanguageSelector from "./languageSelector.jsx";
 import {useTranslation} from "react-i18next";
-import {UserContext} from "../App.jsx";
+import {ThemeContext, UserContext} from "../App.jsx";
 import UserNavigationPanel from "./user-navigation.component.jsx";
 import axios from "axios";
+import {storeInSession} from "../common/session.jsx";
+
+import darkLogo from "../imgs/logo-dark.png";
+import lightLogo from "../imgs/logo-light.png";
 
 const Navbar = () => {
     const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
     const [userNavPanel, setUserNavPanel] = useState(false);
     const searchInputRef = useRef(null);
 
+    const {theme, setTheme} = useContext(ThemeContext);
     const {
         userAuth,
         userAuth: {accessToken, profile_img, new_notification_available},
@@ -33,19 +37,19 @@ const Navbar = () => {
                 })
                 .catch(err => {
                     console.log(err);
-                })
+                });
         }
     }, [accessToken]);
 
     const handleUserNavPanel = () => {
         setUserNavPanel(prev => !prev);
-    }
+    };
 
     const handleBlur = () => {
         setTimeout(() => {
             setUserNavPanel(false);
-        }, 100)
-    }
+        }, 100);
+    };
 
     const handleSearch = (event) => {
         const query = event.target.value;
@@ -53,21 +57,27 @@ const Navbar = () => {
         if (event.keyCode === 13 && query.length) {
             event.target.value = '';
             setSearchBoxVisibility(false);
-            navigate(`/search/${query}`)
+            navigate(`/search/${query}`);
         }
     };
 
     const showSearchBar = () => {
         setSearchBoxVisibility(true);
-        searchInputRef.current?.focus()
-    }
+        searchInputRef.current?.focus();
+    };
 
+    const changeTheme = () => {
+        const newTheme = theme === "light" ? "dark" : "light";
+        setTheme(newTheme);
+        document.body.setAttribute("data-theme", newTheme);
+        storeInSession("theme", newTheme);
+    };
     return (
         <>
             <nav className="navbar flex justify-between w-full h-full z-50">
                 <div className="flex items-center gap-2">
                     <Link to="/" className="w-10 h-10">
-                        <img src={logo} alt="logo"/>
+                        <img src={theme === "light" ? darkLogo : lightLogo} alt="logo"/>
                     </Link>
                     <div
                         className={`search-box ${searchBoxVisibility ? 'show' : 'hide'} md:show absolute bg-white w-full left-0 top-full mt-0.5 border-b border-grey py-4 px-[5vw] md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto`}>
@@ -93,6 +103,10 @@ const Navbar = () => {
                         <i className="fi fi-rr-file-edit"></i>
                         <p>{t("article.write")}</p>
                     </Link>
+
+                    <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10" onClick={changeTheme}>
+                        <i className={"fi fi-rr-" + (theme === "light" ? "moon-stars" : "sun") + " text-2xl block mt-1"}></i>
+                    </button>
 
                     {
                         accessToken ? (
@@ -132,7 +146,7 @@ const Navbar = () => {
             </nav>
             <Outlet/>
         </>
-    )
-}
+    );
+};
 
 export default Navbar;
